@@ -1,0 +1,148 @@
+html,body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.428571429;
+  color: #333333;
+}
+
+#chart-container {
+  position: relative;
+  display: inline-block;
+  top: 10px;
+  left: 10px;
+  height: 700px;
+  width: calc(100% - 24px);
+  border: 2px dashed #aaa;
+  border-radius: 5px;
+  overflow: auto;
+  text-align: center;
+}
+
+.home-link {
+  margin-top: 20px;
+  margin-right: 20px;
+  float: right;
+}
+
+.home-link a {
+  font-size: 36px;
+  color: #d43f3a;
+  text-decoration: none;
+}
+
+.home-link a:hover {
+  text-shadow: 0 0 6px #d43f3a;
+}
+
+.home-link a:hover+i {
+  animation: jump 0.6s ease infinite;
+  -webkit-animation: jump 0.6s ease infinite;
+}
+
+@keyframes jump {
+    0% {top: 0px;}
+    50% {top: -6px;}
+    100% {top: 6px;}
+}
+
+@-webkit-keyframes jump {
+    0% {top: 0px;}
+    50% {top: -6px;}
+    100% {top: 6px;}
+}
+
+.home-link i {
+  position: relative;
+    font-size: 48px;
+    color: #fff;
+    text-shadow: 0 1px 0 #ccc,
+      0 2px 0 #c9c9c9,
+      0 3px 0 #bbb,
+      0 4px 0 #b9b9b9,
+      0 5px 0 #aaa,
+      0 6px 1px rgba(0,0,0,.1),
+      0 0 5px rgba(0,0,0,.1),
+      0 1px 3px rgba(0,0,0,.3),
+      0 3px 5px rgba(0,0,0,.2),
+      0 5px 10px rgba(0,0,0,.25),
+      0 10px 10px rgba(0,0,0,.2),
+      0 20px 20px rgba(0,0,0,.15);
+}
+
+.hidden {
+  display: none;
+}
+
+.orgchart {
+  min-height: 800px;
+  min-width: 202px;
+}
+
+.orgchart .drill-icon {
+  transition: opacity .5s;
+  opacity: 0;
+  right: -10px;
+  top: -10px;
+  z-index: 2;
+  color: rgba(68, 157, 68, 0.5);
+  font-size: 24px;
+  position: absolute;
+}
+
+.orgchart .drill-icon:hover {
+  color: #449d44;
+}
+.orgchart .node {
+  width: 180px;
+}
+
+.orgchart .node:hover .drill-icon {
+  opacity: 1;
+}
+
+.orgchart {
+  background: #fff; 
+}
+.orgchart td.left, .orgchart td.right, .orgchart td.top {
+  border-color: #aaa;
+}
+.orgchart td>.down {
+  background-color: #aaa;
+}
+.orgchart .middle-level .title {
+  background-color: #006699;
+}
+.orgchart .middle-level .content {
+  border-color: #006699;
+}
+.orgchart .product-dept .title {
+  background-color: #009933;
+}
+.orgchart .product-dept .content {
+  border-color: #009933;
+}
+.orgchart .rd-dept .title {
+  background-color: #993366;
+}
+.orgchart .rd-dept .content {
+  border-color: #993366;
+}
+.orgchart .pipeline1 .title {
+  background-color: #996633;
+}
+.orgchart .pipeline1 .content {
+  border-color: #996633;
+}
+.orgchart .frontend1 .title {
+  background-color: #cc0066;
+}
+.orgchart .frontend1 .content {
+  border-color: #cc0066;
+}

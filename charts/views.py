@@ -1,8 +1,12 @@
+from django.http import HttpResponse
+from django.template import loader
 from django.shortcuts import render
 
-# Create your views here.
-from django.http import HttpResponse
+from .models import Employee
 
 
 def index(request):
-    return HttpResponse("Hello, world. You're at the polls index.")
+    new_employees_list = Employee.objects.all()[:5]
+    template = loader.get_template('charts/index.html')
+    context = {'new_employees_list': new_employees_list,}
+    return render(request, 'charts/index.html', context)

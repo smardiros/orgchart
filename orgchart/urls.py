@@ -14,12 +14,17 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import include, url
+from django.conf.urls.static import static
 from django.contrib import admin
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+#from charts import settings
+from django.views.generic import RedirectView
+
+admin.autodiscover()
 
 urlpatterns = [
+	url(r'^$', RedirectView.as_view(url='charts')),
 	url(r'^charts/', include('charts.urls')),
     url(r'^admin/', admin.site.urls),
 ]
 
-from django.conf.urls import include, url
-from django.contrib import admin
