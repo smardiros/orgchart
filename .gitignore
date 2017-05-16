@@ -2,7 +2,5 @@
 /db.sqlite3
 /charts/__pycache__/
 /charts/asso-it.json
-/charts/migrations/0001_initial.py
-/charts/migrations/0002_auto_20170516_1159.py
-/charts/migrations/__pycache__/
+/charts/migrations/
 *.json
