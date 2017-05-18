@@ -5,7 +5,7 @@ class EmployeeAdmin(admin.ModelAdmin):
     list_display = ('name', 'get_departments', 'title')
 
     def get_departments(self, obj):
-    	return "\n".join([p.name for p in obj.departments.all()])
+    	return ", ".join([p.name for p in obj.departments.all()])
 
 
 # Register your models here.

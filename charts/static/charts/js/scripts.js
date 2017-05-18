@@ -28,7 +28,7 @@
         if ($node.is('.drill-down')) {
           var assoClass = data.className.match(/asso-\w+/)[0];
           var drillDownIcon = $('<i>', {
-            'class': 'fa fa-arrow-circle-down drill-icon',
+            'class': 'fa fa-arrow-circle-down drill-icon down',
             'click': function() {
               $('#chart-container').find('.orgchart:visible').addClass('hidden');
               if (!$('#chart-container').find('.orgchart.' + assoClass).length) {
@@ -43,7 +43,7 @@
           var assoClass = data.className.match(/asso-\w+/)[0];
           var upClass = data.className.match(/up-\w+/)[0].replace("up","asso");
           var drillUpIcon = $('<i>', {
-            'class': 'fa fa-arrow-circle-up drill-icon',
+            'class': 'fa fa-arrow-circle-up drill-icon up',
             'click': function() {
               $('#chart-container').find('.orgchart:visible').addClass('hidden');
               if (!$('#chart-container').find('.orgchart.' + upClass).length) {

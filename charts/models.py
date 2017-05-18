@@ -20,6 +20,7 @@ class Department(models.Model):
 	name = models.CharField(max_length=100)
 	abbr = models.CharField(max_length=10)
 	director = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True)
+	parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True)
 
 	def __str__(self):
 		return self.name

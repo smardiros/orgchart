@@ -27,10 +27,14 @@ def dict_to_json_format(employees):
 			json[-1]["children"] = children
 	return json
 
-
+def director_department(employee):
+	department = Department.objects.filter(director = employee)
+	return department
 
 def index(request):
 	departments_list = Department.objects.all()
+
+	drill_employees = {}
 	for department in departments_list:
 		print(department)
 		employees_list = Employee.objects.filter(departments__in=[department])
@@ -48,16 +52,27 @@ def index(request):
 
 
 		for employee in employees_list:
-			if employee is not director:
+			if employee.name != director.name:
+				print(employee)
 				employees_id[employee.name] = employee.employee_id
 				manager_id = employee.manager.employee_id
 				employees_dict[employee.employee_id] = {"name": employee.name, "title": employee.title, "className": employee.displayclass, "manager" : manager_id, "collapsed": employee.collapse, "sub" : {}}
 				print(employee, " ", employee.manager)
+				sub_director = director_department(employee)
+				if sub_director is not None:
+					for dep in sub_director:
+						employees_dict[employee.employee_id]["className"] += " drill-down asso-" + dep.abbr
+						employees_dict[employee.employee_id]["downDep"] = dep.name
+						drill_employees[employee.employee_id] = department
+
+
 
 		print(employees_dict)
 		dir_entry = {"name": director.name, "title": director.title, "className": director.displayclass, "collapsed": director.collapse, "sub" : {}}
 		if director.manager is not None:
-			dir_entry["className"] += " drill-up asso-" + department.abbr
+			dir_entry["className"] += " drill-up asso-" + department.abbr + " up-" + department.parent.abbr
+
+
 		tree = {director.employee_id: dir_entry}
 		employees_dict.pop(director.employee_id, None)
 
