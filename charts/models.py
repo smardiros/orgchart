@@ -8,7 +8,7 @@ class Employee(models.Model):
 	title = models.CharField(max_length=100)
 	displayclass = models.CharField(max_length=200, blank=True)
 	manager = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True)
-	departments = models.ManyToManyField('Department')
+	departments = models.ManyToManyField('Department', blank=True)
 	collapse = models.BooleanField()
 	DepManager = models.BooleanField()
 

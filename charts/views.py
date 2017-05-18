@@ -34,6 +34,9 @@ def index(request):
 	for department in departments_list:
 		print(department)
 		employees_list = Employee.objects.filter(departments__in=[department])
+
+		director = department.director
+		print(director, "\n\n")
 		
 		employees_dict = {}
 		employees_id = {}
@@ -45,33 +48,21 @@ def index(request):
 
 
 		for employee in employees_list:
-			employees_id[employee.name] = employee.employee_id
-			if employee.manager is not None:
-				print(employee.manager.employee_id)
-				print(employees_list.values_list('employee_id'))
-				if (employee.manager.employee_id,) in employees_list.values_list('employee_id'):
-					manager_id = employee.manager.employee_id
-				else:
-					manager_id = None
-					root_id = employee.employee_id
-			else:
-				manager_id = None
-				root_id = employee.employee_id
-			employees_dict[employee.employee_id] = {"name": employee.name, "title": employee.title, "className": employee.displayclass, "manager" : manager_id, "collapsed": employee.collapse, "sub" : {}}
-			if manager_id is None:
-				employees_dict[employee.employee_id]["className"] += " drill-up asso-" + department.abbr
-			print(employee, " ", employee.manager)
+			if employee is not director:
+				employees_id[employee.name] = employee.employee_id
+				manager_id = employee.manager.employee_id
+				employees_dict[employee.employee_id] = {"name": employee.name, "title": employee.title, "className": employee.displayclass, "manager" : manager_id, "collapsed": employee.collapse, "sub" : {}}
+				print(employee, " ", employee.manager)
 
 		print(employees_dict)
-
-		tree = {root_id: employees_dict[root_id]}
-		print(root_id)
-		employees_dict.pop(root_id, None)
+		dir_entry = {"name": director.name, "title": director.title, "className": director.displayclass, "collapsed": director.collapse, "sub" : {}}
+		if director.manager is not None:
+			dir_entry["className"] += " drill-up asso-" + department.abbr
+		tree = {director.employee_id: dir_entry}
+		employees_dict.pop(director.employee_id, None)
 
 		while len(employees_dict) > 0:
 			pop = []
-
-
 			for _id, employee in employees_dict.items():
 				if add_to_tree(tree, employee, _id):
 					pop.append(_id)		
