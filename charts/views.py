@@ -90,7 +90,7 @@ def index(request):
 		url = os.getcwd() + "/charts/static/charts/js/asso-" + department.abbr + ".json"
 
 		with open(url, "w+") as outfile:
-			json.dump(json_tree[0], outfile)
+			json.dump(json_tree[0], outfile, indent=4, separators=(',', ': '))
 
 
 
