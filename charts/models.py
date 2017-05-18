@@ -19,7 +19,7 @@ class Employee(models.Model):
 	collapse = models.BooleanField()
 	DepManager = models.BooleanField()
 
-	color = models.CharField(max_length=20, choices=color_choices,null=True)
+	color = models.CharField(max_length=20, choices=color_choices,null=True,blank=True)
 
 	def __str__(self):
 		return self.name
@@ -30,7 +30,7 @@ class Department(models.Model):
 	abbr = models.CharField(max_length=10)
 	director = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True)
 	parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True)
-	color = models.CharField(max_length=20, choices=color_choices,null=True)
+	color = models.CharField(max_length=20, choices=color_choices,null=True,blank=True)
 
 	def __str__(self):
 		return self.name

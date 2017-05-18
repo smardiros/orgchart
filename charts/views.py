@@ -17,12 +17,20 @@ def add_to_tree(tree, employee, e_id):
 
 	return False
 
-def dict_to_json_format(employees):
+def dict_to_json_format(employees, collapsed=False):
+
 	json = []
 	for _id, employee in employees.items():
 		sub = employee.pop("sub")
 		json.append(employee)
-		children = dict_to_json_format(sub)
+
+
+		if collapsed:
+			json[-1]["className"] += " slide-up"
+
+
+		children = dict_to_json_format(sub,employee["collapsed"])
+		
 		if children:
 			json[-1]["children"] = children
 	return json
@@ -59,6 +67,14 @@ def index(request):
 				employees_dict[employee.employee_id] = {"name": employee.name, "title": employee.title, "className": employee.displayclass, "manager" : manager_id, "collapsed": employee.collapse, "sub" : {}, "department": department.name}
 				print(employee, " ", employee.manager)
 				sub_director = director_department(employee)
+				color = " "
+				if employee.color is not None:
+					color += employee.color
+				elif department.color is not None:
+					color += department.color
+
+				employees_dict[employee.employee_id]["className"] += color
+
 				if sub_director is not None:
 					print(len(sub_director))
 					if len(sub_director) == 1:
@@ -70,14 +86,10 @@ def index(request):
 						employees_dict[employee.employee_id]["collapsed"] = True
 						temp_id = -1
 						for dep in sub_director:
-							temp_employee = {"name": "", "title": dep.name, "className": "slide-up drill-down asso-" + dep.abbr, "manager" : employee.employee_id, "collapsed": employee.collapse, "sub" : {}, "downDep": dep.name}
+							temp_employee = {"name": "", "title": dep.name, "className": "slide-up drill-down asso-" + dep.abbr + color, "manager" : employee.employee_id, "collapsed": employee.collapse, "sub" : {}, "downDep": dep.name}
 							employees_dict[temp_id] = temp_employee
 							temp_id -= 1
 
-				if employee.color is not None:
-					employees_dict[employee.employee_id]["className"] += " " + employee.color
-				elif department.color is not None:
-					employees_dict[employee.employee_id]["className"] += " " + department.color
 
 
 
