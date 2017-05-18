@@ -168,3 +168,38 @@ body {
 .orgchart .frontend1 .content {
   border-color: #cc0066;
 }
+
+.orgchart .navy .title {
+  background-color: #001f3f;
+}
+.orgchart .navy .content {
+  border-color: #001f3f;
+}
+
+.orgchart .blue .title {
+  background-color: #0074D9;
+}
+.orgchart .blue .content {
+  border-color: #0074D9;
+}
+
+.orgchart .aqua .title {
+  background-color: #7FDBFF;
+}
+.orgchart .aqua .content {
+  border-color: #7FDBFF;
+}
+
+.orgchart .teal .title {
+  background-color: #39CCCC;
+}
+.orgchart .teal .content {
+  border-color: #39CCCC;
+}
+
+.orgchart .olive .title {
+  background-color: #3D9970;
+}
+.orgchart .olive .content {
+  border-color: #3D9970;
+}

@@ -1,6 +1,13 @@
 from django.db import models
 
 # Create your models here.
+color_choices = (
+	("navy", 'Navy'),
+	("blue", 'Blue'),
+	("aqua", 'Aqua'),
+	("teal", 'Teal'),
+	("olive", 'Olive'),
+)
 
 class Employee(models.Model):
 	employee_id = models.AutoField(primary_key=True)
@@ -12,6 +19,8 @@ class Employee(models.Model):
 	collapse = models.BooleanField()
 	DepManager = models.BooleanField()
 
+	color = models.CharField(max_length=20, choices=color_choices,null=True)
+
 	def __str__(self):
 		return self.name
 
@@ -21,6 +30,7 @@ class Department(models.Model):
 	abbr = models.CharField(max_length=10)
 	director = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True)
 	parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True)
+	color = models.CharField(max_length=20, choices=color_choices,null=True)
 
 	def __str__(self):
 		return self.name

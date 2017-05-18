@@ -74,12 +74,22 @@ def index(request):
 							employees_dict[temp_id] = temp_employee
 							temp_id -= 1
 
+				if employee.color is not None:
+					employees_dict[employee.employee_id]["className"] += " " + employee.color
+				elif department.color is not None:
+					employees_dict[employee.employee_id]["className"] += " " + department.color
+
 
 
 		print(employees_dict)
 		dir_entry = {"name": director.name, "title": director.title, "className": director.displayclass, "collapsed": director.collapse, "sub" : {}, "department": department.name}
+		if director.color is not None:
+			dir_entry["className"] += " " + director.color
+		elif department.color is not None:
+			dir_entry["className"] += " " + department.color
 		if director.manager is not None:
 			dir_entry["className"] += " drill-up asso-" + department.abbr + " up-" + department.parent.abbr
+
 
 
 		tree = {director.employee_id: dir_entry}
