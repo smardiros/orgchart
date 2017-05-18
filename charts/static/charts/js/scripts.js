@@ -57,7 +57,7 @@
                 initOrgchart(upClass);
               } else {
                $('#chart-container').find('.orgchart.' + upClass).removeClass('hidden');
-               $('#chart-title').html("<p>" + get_department(assoClass) + "</p>");
+               $('#chart-title').html("<p>" + get_department(upClass) + "</p>");
               }
             }
           });
