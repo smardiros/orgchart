@@ -60,10 +60,19 @@ def index(request):
 				print(employee, " ", employee.manager)
 				sub_director = director_department(employee)
 				if sub_director is not None:
-					for dep in sub_director:
+					print(len(sub_director))
+					if len(sub_director) == 1:
+						dep = sub_director[0]
 						employees_dict[employee.employee_id]["className"] += " drill-down asso-" + dep.abbr
 						employees_dict[employee.employee_id]["downDep"] = dep.name
 						drill_employees[employee.employee_id] = department
+					else:
+						employees_dict[employee.employee_id]["collapsed"] = True
+						temp_id = -1
+						for dep in sub_director:
+							temp_employee = {"name": "", "title": dep.name, "className": "slide-up drill-down asso-" + dep.abbr, "manager" : employee.employee_id, "collapsed": employee.collapse, "sub" : {}, "downDep": dep.name}
+							employees_dict[temp_id] = temp_employee
+							temp_id -= 1
 
 
 
