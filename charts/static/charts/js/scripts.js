@@ -16,6 +16,12 @@
     return json;
   }; 
 
+  function get_department(rootClass){
+    var data = datasource(rootClass)
+    var dep = data.department
+    return dep
+  }
+
   function initOrgchart(rootClass) {
     $('#chart-container').orgchart({
       'chartClass': rootClass,
@@ -35,6 +41,7 @@
                 initOrgchart(assoClass);
               } else {
                 $('#chart-container').find('.orgchart.' + assoClass).removeClass('hidden');
+                $('#chart-title').html("<p>" + get_department(assoClass) + "</p>");
               }
             }
           });
@@ -50,6 +57,7 @@
                 initOrgchart(upClass);
               } else {
                $('#chart-container').find('.orgchart.' + upClass).removeClass('hidden');
+               $('#chart-title').html("<p>" + get_department(assoClass) + "</p>");
               }
             }
           });
@@ -57,6 +65,7 @@
         }
       }
     });
+    $('#chart-title').html("<p>" + get_department(rootClass) + "</p>");
   }
 
   $(function() {

@@ -56,7 +56,7 @@ def index(request):
 				print(employee)
 				employees_id[employee.name] = employee.employee_id
 				manager_id = employee.manager.employee_id
-				employees_dict[employee.employee_id] = {"name": employee.name, "title": employee.title, "className": employee.displayclass, "manager" : manager_id, "collapsed": employee.collapse, "sub" : {}}
+				employees_dict[employee.employee_id] = {"name": employee.name, "title": employee.title, "className": employee.displayclass, "manager" : manager_id, "collapsed": employee.collapse, "sub" : {}, "department": department.name}
 				print(employee, " ", employee.manager)
 				sub_director = director_department(employee)
 				if sub_director is not None:
@@ -77,7 +77,7 @@ def index(request):
 
 
 		print(employees_dict)
-		dir_entry = {"name": director.name, "title": director.title, "className": director.displayclass, "collapsed": director.collapse, "sub" : {}}
+		dir_entry = {"name": director.name, "title": director.title, "className": director.displayclass, "collapsed": director.collapse, "sub" : {}, "department": department.name}
 		if director.manager is not None:
 			dir_entry["className"] += " drill-up asso-" + department.abbr + " up-" + department.parent.abbr
 
