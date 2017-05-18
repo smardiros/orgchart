@@ -25,6 +25,12 @@ body {
   text-align: center;
 }
 
+.heading {
+  font-size: 20px;
+  z-index: 1000;
+  position:relative;
+}
+
 .home-link {
   margin-top: 20px;
   margin-right: 20px;
@@ -78,11 +84,17 @@ body {
 
 .hidden {
   display: none;
+
+}
+
+.visuallyhidden {
+  opacity: 0;
 }
 
 .orgchart {
   min-height: 800px;
   min-width: 202px;
+
 }
 
 
@@ -94,6 +106,7 @@ body {
   color: rgba(68, 157, 68, 0.5);
   font-size: 24px;
   position: absolute;
+
 }
 
 .orgchart .down {

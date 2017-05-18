@@ -42,7 +42,7 @@ def director_department(employee):
 def index(request):
 	departments_list = Department.objects.all()
 
-	drill_employees = {}
+
 	for department in departments_list:
 		print(department)
 		employees_list = Employee.objects.filter(departments__in=[department])
@@ -64,7 +64,7 @@ def index(request):
 				print(employee)
 				employees_id[employee.name] = employee.employee_id
 				manager_id = employee.manager.employee_id
-				employees_dict[employee.employee_id] = {"name": employee.name, "title": employee.title, "className": employee.displayclass, "manager" : manager_id, "collapsed": employee.collapse, "sub" : {}, "department": department.name}
+				employees_dict[employee.employee_id] = {"name": employee.name, "title": employee.title, "className": "", "manager" : manager_id, "collapsed": employee.collapse, "sub" : {}, "department": department.name}
 				print(employee, " ", employee.manager)
 				sub_director = director_department(employee)
 				color = " "
@@ -81,7 +81,7 @@ def index(request):
 						dep = sub_director[0]
 						employees_dict[employee.employee_id]["className"] += " drill-down asso-" + dep.abbr
 						employees_dict[employee.employee_id]["downDep"] = dep.name
-						drill_employees[employee.employee_id] = department
+
 					else:
 						employees_dict[employee.employee_id]["collapsed"] = True
 						temp_id = -1
@@ -94,7 +94,7 @@ def index(request):
 
 
 		print(employees_dict)
-		dir_entry = {"name": director.name, "title": director.title, "className": director.displayclass, "collapsed": director.collapse, "sub" : {}, "department": department.name}
+		dir_entry = {"name": director.name, "title": director.title, "className": "", "collapsed": director.collapse, "sub" : {}, "department": department.name}
 		if director.color is not None:
 			dir_entry["className"] += " " + director.color
 		elif department.color is not None:

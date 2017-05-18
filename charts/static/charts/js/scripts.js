@@ -36,6 +36,8 @@
           var drillDownIcon = $('<i>', {
             'class': 'fa fa-arrow-circle-down drill-icon down',
             'click': function() {
+              
+              
               $('#chart-container').find('.orgchart:visible').addClass('hidden');
               if (!$('#chart-container').find('.orgchart.' + assoClass).length) {
                 initOrgchart(assoClass);
