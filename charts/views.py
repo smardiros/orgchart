@@ -42,6 +42,8 @@ def director_department(employee):
 def index(request):
 	departments_list = Department.objects.all()
 
+	out = []
+
 
 	for department in departments_list:
 		print(department)
@@ -139,8 +141,10 @@ def index(request):
 		with open(url, "w+") as outfile:
 			json.dump(json_tree[0], outfile, indent=4, separators=(',', ': '))
 
+		out.append([department.abbr, json.dumps(json_tree[0])])
+
 
 
 	template = loader.get_template('charts/index.html')
-	context = {'new_employees_list': employees_list,}
+	context = {'new_employees_list': employees_list, 'employees_tree':out}
 	return render(request, 'charts/index.html', context)

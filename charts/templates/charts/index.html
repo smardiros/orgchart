@@ -1,5 +1,7 @@
 {% extends 'charts/base.html' %}
 
+{% load js %}
+
 {% block body_block %}
 
 	<div id="chart-container">
@@ -8,4 +10,11 @@
 
 {% endblock %}
 
+{% block more_scripts %}
+	<script type="text/javascript">
+	{% for dict in employees_tree %}
+		var {{ dict.0 }} = {{ dict.1 | js}}
+	{% endfor %}
+  	</script>
+{% endblock %}
 

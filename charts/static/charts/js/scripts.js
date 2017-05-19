@@ -17,7 +17,7 @@
   }; 
 
   function get_department(rootClass){
-    var data = datasource(rootClass)
+    var data = JSON.parse(window[rootClass])
     var dep = data.department
     return dep
   }
@@ -26,13 +26,14 @@
     $('#chart-container').orgchart({
       'chartClass': rootClass,
       //'data' : datasource[0], 
-      'data' : datasource(rootClass),
+      'data' : JSON.parse(window[rootClass]),//datasource(rootClass),
       'nodeContent': 'title',
+      'draggable': true,
       'pan': true,
       'zoom': true,
       'createNode': function($node, data) {
         if ($node.is('.drill-down')) {
-          var assoClass = data.className.match(/asso-\w+/)[0];
+          var assoClass = data.className.match(/asso-\w+/)[0].replace("asso-","");
           var drillDownIcon = $('<i>', {
             'class': 'fa fa-arrow-circle-down drill-icon down',
             'click': function() {
@@ -49,8 +50,8 @@
           });
           $node.append(drillDownIcon);
         } else if ($node.is('.drill-up')) {
-          var assoClass = data.className.match(/asso-\w+/)[0];
-          var upClass = data.className.match(/up-\w+/)[0].replace("up","asso");
+          var assoClass = data.className.match(/asso-\w+/)[0].replace("asso-","");
+          var upClass = data.className.match(/up-\w+/)[0].replace("up-","");
           var drillUpIcon = $('<i>', {
             'class': 'fa fa-arrow-circle-up drill-icon up',
             'click': function() {
@@ -75,7 +76,7 @@
 
   $(function() {
 
-    initOrgchart('asso-it');
+    initOrgchart('it');
 
   });
 
