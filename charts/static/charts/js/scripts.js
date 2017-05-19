@@ -65,6 +65,9 @@
           });
           $node.append(drillUpIcon);
         }
+        if ($node.is('.picture')) {
+          var url = data.picture;
+        }
       }
     });
     $('#chart-title').html("<p>" + get_department(rootClass) + "</p>");

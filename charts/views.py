@@ -73,6 +73,11 @@ def index(request):
 				elif department.color is not None:
 					color += department.color
 
+				if employee.picture.name:
+					print("picture + ", employee.picture)
+					employees_dict[employee.employee_id]["picture"] = employee.picture.url
+					employees_dict[employee.employee_id]["className"] += " picture"
+
 				employees_dict[employee.employee_id]["className"] += color
 
 				if sub_director is not None:
@@ -101,6 +106,11 @@ def index(request):
 			dir_entry["className"] += " " + department.color
 		if director.manager is not None:
 			dir_entry["className"] += " drill-up asso-" + department.abbr + " up-" + department.parent.abbr
+
+		if director.picture.name:
+			dir_entry["picture"] = director.picture.url
+			dir_entry["className"] += " picture"
+
 
 
 

@@ -20,6 +20,10 @@
   <div>
     {% block body_block %}{% endblock %}
   </div>
+  <script>
+    var media_url = "{% get_media_prefix %}";
+  </script>
+  
   <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
   <script type="text/javascript" src="https://cdn.rawgit.com/jakerella/jquery-mockjax/master/dist/jquery.mockjax.min.js"></script>
   <script type="text/javascript" src="{% static 'charts/js/jquery.orgchart.js' %}"></script>
