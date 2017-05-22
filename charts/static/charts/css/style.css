@@ -12,6 +12,8 @@ body {
   color: #333333;
 }
 
+
+
 #chart-container {
   position: relative;
   display: inline-block;
@@ -218,4 +220,22 @@ body {
 }
 .orgchart .olive .content {
   border-color: #3D9970;
+}
+
+.save-button {
+  width:100%;
+  height:100%;
+  text-align:center;
+}
+
+.button {
+  position: relative;
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 10px 12px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
 }

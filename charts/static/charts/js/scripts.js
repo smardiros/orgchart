@@ -72,6 +72,32 @@
       }
     });
     $('#chart-title').html("<p>" + get_department(rootClass) + "</p>");
+    var savebutton = document.createElement('button');
+    savebutton.setAttribute('class', 'button')
+    savebutton.innerHTML = 'Save';
+    var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+      return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+      beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+      }
+    });
+    savebutton.onclick = function(){
+      $.ajax({
+        type: "POST",
+        url: "/charts/update/",
+        data: {'data':window[rootClass]}
+      });
+    };
+    // where do we want to have the button to appear?
+    // you can append it to another element just by doing something like
+    // document.getElementById('foobutton').appendChild(button);
+    document.getElementById('save-button').appendChild(savebutton)
   }
 
   $(function() {

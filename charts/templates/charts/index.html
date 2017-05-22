@@ -2,10 +2,16 @@
 
 {% load js %}
 
+{% csrf_token %}
+
 {% block body_block %}
 
 	<div id="chart-container">
 		<div id="chart-title" class="heading"></div>	
+	</div>
+
+	<div id="save-button" class="save-button">
+
 	</div>
 
 {% endblock %}
@@ -16,5 +22,6 @@
 		var {{ dict.0 }} = {{ dict.1 | js}}
 	{% endfor %}
   	</script>
+  	{% csrf_token %}
 {% endblock %}
 
