@@ -97,7 +97,7 @@
         }
       });
     };
-    document.getElementById('save-button').appendChild(savebutton);
+    document.getElementById('save-button').replaceChild(savebutton, document.getElementById('save-button').childNodes[0]);
     window.curr_department = rootClass;
   }
 
