@@ -91,7 +91,10 @@
       $.ajax({
         type: "POST",
         url: "/charts/update/",
-        data: {'data':window[rootClass]}
+        data: {
+          'data':window[rootClass],
+          'department':rootClass
+        }
       });
     };
     document.getElementById('save-button').appendChild(savebutton);
