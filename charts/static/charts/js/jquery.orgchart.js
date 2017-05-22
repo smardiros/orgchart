@@ -919,11 +919,52 @@
         $(this).closest('.orgchart').find('.allowedDrop').removeClass('allowedDrop');
       })
       .on('drop', function(event) {
+        var $json_dict = JSON.parse(window[curr_department])
         var $dropZone = $(this);
         var $orgchart = $dropZone.closest('.orgchart');
         var $dragged = $orgchart.data('dragged');
+        var $name = $dragged[0].firstChild.innerText;
+        var $dest_parent = $dropZone[0].firstChild.innerText;
         $orgchart.find('.allowedDrop').removeClass('allowedDrop');
         var $dragZone = $dragged.closest('.nodes').siblings().eq(0).children();
+
+        // remove dragged node from dict
+        function popnode(dict, node_name) {
+          var $to_copy = {};
+          for (var i=0;i<dict['children'].length;i++) {
+            if (dict['children'][i]['name'] === node_name){
+              $to_copy = JSON.parse(JSON.stringify(dict['children'][i]));
+              dict['children'].splice(i,1);
+              return $to_copy;
+            } else {
+              $to_copy = popnode(dict['children'][i], node_name);
+              if ($to_copy) {
+                return $to_copy;
+              }
+            }
+          }
+          return null;
+        }
+
+        // add dragged node to new position in dict
+        function addnode(dict, node, dest_name) {
+          for (var i=0;i<dict['children'].length;i++) {
+            if (dict['children'][i]['name'] === dest_name){
+              dict['children'][i]['children'].push(JSON.parse(JSON.stringify(node)));
+              return true;
+            } else {
+              if (addnode(dict['children'][i], node, dest_name)){
+                return true;
+              }
+            }
+          }
+          return false;
+        }
+
+        // update json dict
+        var $to_copy = popnode($json_dict, $name);
+        addnode($json_dict,$to_copy,$dest_parent);
+        window[curr_department] = JSON.stringify($json_dict);
         // firstly, deal with the hierarchy of drop zone
         if (!$dropZone.closest('tr').siblings().length) { // if the drop zone is a leaf node
           $dropZone.append('<i class="edge verticalEdge bottomEdge fa"></i>')

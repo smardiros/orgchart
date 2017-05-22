@@ -94,10 +94,8 @@
         data: {'data':window[rootClass]}
       });
     };
-    // where do we want to have the button to appear?
-    // you can append it to another element just by doing something like
-    // document.getElementById('foobutton').appendChild(button);
-    document.getElementById('save-button').appendChild(savebutton)
+    document.getElementById('save-button').appendChild(savebutton);
+    window.curr_department = rootClass;
   }
 
   $(function() {
