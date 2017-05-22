@@ -931,15 +931,17 @@
         // remove dragged node from dict
         function popnode(dict, node_name) {
           var $to_copy = {};
-          for (var i=0;i<dict['children'].length;i++) {
-            if (dict['children'][i]['name'] === node_name){
-              $to_copy = JSON.parse(JSON.stringify(dict['children'][i]));
-              dict['children'].splice(i,1);
-              return $to_copy;
-            } else {
-              $to_copy = popnode(dict['children'][i], node_name);
-              if ($to_copy) {
+          if ( 'children' in dict ){
+            for (var i=0;i<dict['children'].length;i++) {
+              if (dict['children'][i]['name'] === node_name){
+                $to_copy = JSON.parse(JSON.stringify(dict['children'][i]));
+                dict['children'].splice(i,1);
                 return $to_copy;
+              } else {
+                $to_copy = popnode(dict['children'][i], node_name);
+                if ($to_copy) {
+                  return $to_copy;
+                }
               }
             }
           }
@@ -948,13 +950,18 @@
 
         // add dragged node to new position in dict
         function addnode(dict, node, dest_name) {
-          for (var i=0;i<dict['children'].length;i++) {
-            if (dict['children'][i]['name'] === dest_name){
-              dict['children'][i]['children'].push(JSON.parse(JSON.stringify(node)));
-              return true;
-            } else {
-              if (addnode(dict['children'][i], node, dest_name)){
+          if (dict['name'] === dest_name) {
+            dict['children'].push(JSON.parse(JSON.stringify(node)));
+            return true;
+          } else if ( 'children' in dict ){
+            for (var i=0;i<dict['children'].length;i++) {
+              if (dict['children'][i]['name'] === dest_name){
+                dict['children'][i]['children'].push(JSON.parse(JSON.stringify(node)));
                 return true;
+              } else {
+                if (addnode(dict['children'][i], node, dest_name)){
+                  return true;
+                }
               }
             }
           }
@@ -963,6 +970,8 @@
 
         // update json dict
         var $to_copy = popnode($json_dict, $name);
+
+        $to_copy['changed'] = true;
         addnode($json_dict,$to_copy,$dest_parent);
         window[curr_department] = JSON.stringify($json_dict);
         // firstly, deal with the hierarchy of drop zone
