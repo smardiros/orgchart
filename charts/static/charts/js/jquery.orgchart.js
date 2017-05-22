@@ -631,9 +631,9 @@
       .append(typeof opts.nodeContent !== 'undefined' ? '<div class="content">' + (nodeData[opts.nodeContent] || '') + '</div>' : '');
     // append 4 direction arrows or expand/collapse buttons
     var flags = nodeData.relationship || '';
-    // if (nodeData.className.includes('picture')){
-    //   $nodeDiv.append('<i src=' + media_url + nodeData.picture + '></i>');
-    // }
+    if (nodeData.className.includes('picture')){
+      $nodeDiv.append('<i src=../' + nodeData.picture + '></i>');
+    }
     if (opts.verticalDepth && (level + 2) > opts.verticalDepth) {
       if ((level + 1) >= opts.verticalDepth && Number(flags.substr(2,1))) {
         var icon = level + 1  >= opts.depth ? 'plus' : 'minus';
@@ -680,6 +680,12 @@
     $nodeDiv.on('click', function(event) {
       $(this).closest('.orgchart').find('.focused').removeClass('focused');
       $(this).addClass('focused');
+      if (nodeData.className.includes('picture')){
+        $('#pic-container').html('<img class= \'profile-pic\' src=' + nodeData.picture + '></img>');
+      } else {
+        $('#pic-container').html('');
+      }
+      $('#profile-container').html('<b>' + nodeData.name + '</b>');
     });
 
     // define click event handler for the top edge
