@@ -136,16 +136,17 @@ def index(request):
 
 	out = []
 
-
 	for department in departments_list:
 
 		out.append([department.abbr, json.dumps(department_dict(department)[0])])
 
-
-
 	template = loader.get_template('charts/index.html')
 	context = { 'employees_tree':out}
 	return render(request, 'charts/index.html', context)
+
+
+
+
 
 def dict_to_list(employee_dict, manager=None):
 	dict_list = []
@@ -182,19 +183,14 @@ def update(request):
 	print(department[0])
 
 	#data_base_dict = department_dict(department[0])[0]
-	employees_list = Employee.objects.filter(departments__in=[department[0]])
+	#employees_list = Employee.objects.filter(departments__in=[department[0]])
 
 	updated_employees_list = dict_to_list(updated_dict)
-
-#	print(updated_employees_list)
-#	print(employees_list)
-
 
 	for employee in updated_employees_list:
 		if 'changed' in employee:
 			print(employee)
 			update_employee(employee)
-
 
 
 	return HttpResponse()
