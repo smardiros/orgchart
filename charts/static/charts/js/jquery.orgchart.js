@@ -686,6 +686,12 @@
         $('#pic-container').html('');
       }
       $('#profile-container').html('<b>' + nodeData.name + '</b>');
+      var profilesavebutton = document.createElement('button');
+      profilesavebutton.innerHTML = 'Save';
+      profilesavebutton.onclick = function(){
+        alert('not saving yet!')
+      };
+      document.getElementById('profile-save-button').replaceChild(profilesavebutton, document.getElementById('profile-save-button').childNodes[0]);
     });
 
     // define click event handler for the top edge

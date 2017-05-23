@@ -73,8 +73,8 @@
     });
     $('#chart-title').html("<p>" + get_department(rootClass) + "</p>");
     var savebutton = document.createElement('button');
-    savebutton.setAttribute('class', 'chart-button')
-    savebutton.innerHTML = 'Save';
+    savebutton.setAttribute('class', 'chart-button');
+    savebutton.innerHTML = 'Save Chart';
     var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
     function csrfSafeMethod(method) {
         // these HTTP methods do not require CSRF protection
@@ -101,12 +101,7 @@
     document.getElementById('save-button').replaceChild(savebutton, document.getElementById('save-button').childNodes[0]);
 
 
-    var profilesavebutton = document.createElement('button');
-    profilesavebutton.innerHTML = 'Save';
-    profilesavebutton.onclick = function(){
-      alert('not saving yet!')
-    };
-    document.getElementById('profile-save-button').replaceChild(profilesavebutton, document.getElementById('profile-save-button').childNodes[0]);
+
     window.curr_department = rootClass;
   }
 
