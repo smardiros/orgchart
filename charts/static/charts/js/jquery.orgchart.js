@@ -681,7 +681,7 @@
       $(this).closest('.orgchart').find('.focused').removeClass('focused');
       $(this).addClass('focused');
       if (nodeData.className.includes('picture')){
-        $('#pic-container').html('<img class= \'profile-pic\' src=' + nodeData.picture + '></img>');
+        $('#pic-container').html('<img class= \'profile-pic img-circle\' src=' + nodeData.picture + '></img>');
       } else {
         $('#pic-container').html('');
       }

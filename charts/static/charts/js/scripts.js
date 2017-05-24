@@ -73,8 +73,8 @@
     });
     $('#chart-title').html("<p>" + get_department(rootClass) + "</p>");
     var savebutton = document.createElement('button');
-    savebutton.setAttribute('class', 'chart-button');
-    savebutton.innerHTML = 'Save Chart';
+    savebutton.setAttribute('class', 'btn btn-success');
+    savebutton.innerHTML = 'Save';
     var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
     function csrfSafeMethod(method) {
         // these HTTP methods do not require CSRF protection
@@ -94,6 +94,12 @@
         data: {
           'data':window[rootClass],
           'department':rootClass
+        },
+        success: function() {
+          $('#save-button').append('<div class="alert alert-success alert-dismissable"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> <strong>Success!</strong> Chart changes saved.</div>')
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) { 
+            $('#save-button').append('<div class="alert alert-danger alert-dismissable"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> <strong>Save Failed</strong>' + " Error: " + errorThrown +'</div>')
         }
       });
     };
