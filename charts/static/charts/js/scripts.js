@@ -48,6 +48,7 @@
               }
               $( ":contains('" + get_department(assoClass) + "')" ).addClass("active mx-auto");
               $( ":not(:contains('" + get_department(assoClass) + "'))" ).removeClass("active mx-auto");
+              window.curr_department = assoClass;
             }
           });
           $node.append(drillDownIcon);
@@ -66,6 +67,7 @@
               }
               $( ":contains('" + get_department(upClass) + "')" ).addClass("active mx-auto");
               $( ":not(:contains('" + get_department(upClass) + "'))" ).removeClass("active mx-auto");
+              window.curr_department = upClass;
             }
           });
           $node.append(drillUpIcon);
