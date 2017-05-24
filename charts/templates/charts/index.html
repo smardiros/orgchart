@@ -5,7 +5,17 @@
 {% csrf_token %}
 
 {% block body_block %}
+	<script type="text/javascript">
+	var departments = [];
+	{% for dict in employees_tree %}
+		departments.push( "{{ dict.0 }}")
+		var {{ dict.0 }} = {{ dict.1 | js}};
+	{% endfor %}
 
+	{% if department %}
+		var department = "{{ department }}";
+	{% endif %}
+  	</script>
 
 	<nav class="navbar navbar-inverse navbar-fixed-top ">
       <div class="container">
@@ -20,9 +30,14 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse mx-auto">
           <ul class="nav navbar-nav ">
-            <li class="active mx-auto"><a href="#">Home</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#contact">Contact</a></li>
+          	{% for dict in employees_tree %}
+          		{% if dict.0 == department  %} 
+          			<li class="active mx-auto">
+          		{% else %}
+          			<li>
+          		{% endif %}
+          		<a href="/charts/?dep={{dict.0}}"> {{ dict.2 }} </a></li>
+          	{% endfor %}
           </ul>
         </div><!--/.nav-collapse -->
       </div>
@@ -63,11 +78,7 @@
 {% endblock %}
 
 {% block more_scripts %}
-	<script type="text/javascript">
-	{% for dict in employees_tree %}
-		var {{ dict.0 }} = {{ dict.1 | js}}
-	{% endfor %}
-  	</script>
+
   	{% csrf_token %}
 {% endblock %}
 

@@ -46,6 +46,8 @@
                 $('#chart-container').find('.orgchart.' + assoClass).removeClass('hidden');
                 $('#chart-title').html("<p>" + get_department(assoClass) + "</p>");
               }
+              $( ":contains('" + get_department(assoClass) + "')" ).addClass("active mx-auto");
+              $( ":not(:contains('" + get_department(assoClass) + "'))" ).removeClass("active mx-auto");
             }
           });
           $node.append(drillDownIcon);
@@ -62,6 +64,8 @@
                $('#chart-container').find('.orgchart.' + upClass).removeClass('hidden');
                $('#chart-title').html("<p>" + get_department(upClass) + "</p>");
               }
+              $( ":contains('" + get_department(upClass) + "')" ).addClass("active mx-auto");
+              $( ":not(:contains('" + get_department(upClass) + "'))" ).removeClass("active mx-auto");
             }
           });
           $node.append(drillUpIcon);
@@ -96,10 +100,10 @@
           'department':rootClass
         },
         success: function() {
-          $('#save-button').append('<div class="alert alert-success alert-dismissable"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> <strong>Success!</strong> Chart changes saved.</div>')
+          $('#save-button').append('<div class="alert alert-success alert-dismissable fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> <strong>Success!</strong> Chart changes saved.</div>')
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) { 
-            $('#save-button').append('<div class="alert alert-danger alert-dismissable"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> <strong>Save Failed</strong>' + " Error: " + errorThrown +'</div>')
+            $('#save-button').append('<div class="alert alert-danger alert-dismissable fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> <strong>Save Failed</strong>' + " Error: " + errorThrown +'</div>')
         }
       });
     };
@@ -112,8 +116,20 @@
   }
 
   $(function() {
+    var x = window['department'];
 
-    initOrgchart('it');
+    if(typeof (x) !== 'undefined'){
+      var y = window[x];
+      if (typeof y !== 'undefined'){
+       initOrgchart(window['department'])
+      } else {
+        initOrgchart('it');
+      }
+    } else {
+      initOrgchart('it');
+    }
+
+    
 
   });
 

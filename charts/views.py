@@ -138,10 +138,15 @@ def index(request):
 
 	for department in departments_list:
 
-		out.append([department.abbr, json.dumps(department_dict(department)[0])])
+		out.append([department.abbr, json.dumps(department_dict(department)[0]), department.name])
 
 	template = loader.get_template('charts/index.html')
 	context = { 'employees_tree':out}
+	department = request.GET.get('dep', '')
+	if (department):
+		context['department']=str(department)
+
+	print(department)
 	return render(request, 'charts/index.html', context)
 
 
