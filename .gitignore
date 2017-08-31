@@ -1,6 +1,9 @@
 /orgchart/__pycache__/
+/orgchart/static/
 /db.sqlite3
 /charts/__pycache__/
 /charts/asso-it.json
 /charts/migrations/
+/charts/templatetags/__pycache__/
+orgchart/settings.txt
 *.json

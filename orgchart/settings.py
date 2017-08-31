@@ -25,7 +25,7 @@ SECRET_KEY = '5!sgqhyab+g1klaz)*^_3db(3w!x&j18t+4s0#93g9b@t+xa1_'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*', 'http://dc-samweb.egpaf.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -76,8 +76,12 @@ WSGI_APPLICATION = 'orgchart.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'django',                      
+        'USER': 'postgres',
+        'PASSWORD': 'FDaev!3421',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -117,7 +121,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
-    
+STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, 'orgchart', 'static'))    
 STATIC_URL = '/static/'
 
 MEDIA_URL = '/media/'
