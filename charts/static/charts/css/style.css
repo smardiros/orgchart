@@ -1,8 +1,8 @@
 html,body {
   width: 100%;
-  height: 100%;
+  height: calc(100vh - 50px);
   margin: 0;
-  padding-top: 50px;
+  /*padding-top: 50px;*/
 }
 
 body {
@@ -10,6 +10,7 @@ body {
   font-size: 14px;
   line-height: 1.428571429;
   color: #333333;
+  /*padding-top: 50px;*/
 }
 
 .left {
@@ -35,7 +36,7 @@ body {
   display: inline-block;
   top: 10px;
   left: 10px;
-  height: calc(100vh - 300px);
+/*  height: calc(100vh - 300px);*/
   width: calc(100% - 24px);
   border: 2px dashed #aaa;
   border-radius: 5px;

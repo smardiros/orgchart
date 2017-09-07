@@ -5,6 +5,7 @@
 {% csrf_token %}
 
 {% block body_block %}
+	<body style="padding-top:100px; ! important;"> 
 	<script type="text/javascript">
 	var departments = [];
 	{% for dict in employees_tree %}

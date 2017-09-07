@@ -3,6 +3,9 @@ from django.template import loader
 from django.shortcuts import render
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.views.decorators.http import require_http_methods
+from django.views.decorators.clickjacking import xframe_options_exempt
+
+
 
 from .models import Employee, Department
 import os
@@ -148,8 +151,25 @@ def index(request):
 
 	print(department)
 	return render(request, 'charts/index.html', context)
+	
+@xframe_options_exempt
+def embed(request):
+	departments_list = Department.objects.all()
 
+	out = []
 
+	for department in departments_list:
+
+		out.append([department.abbr, json.dumps(department_dict(department)[0]), department.name])
+
+	template = loader.get_template('charts/index.html')
+	context = { 'employees_tree':out}
+	department = request.GET.get('dep', '')
+	if (department):
+		context['department']=str(department)
+
+	print(department)
+	return render(request, 'charts/embed.html', context)
 
 
 
