@@ -39,7 +39,7 @@ class UserAutocomplete(autocomplete.Select2ListView):
 		pythoncom.CoInitialize()
 		q = pyad.adquery.ADQuery(options=dict(ldap_server="dc-net1.egpaf.com"))
 		q.execute_query(attributes = ["distinguishedName", "description"], base_dn = "OU= - Washington DC, OU=EGPAF Users - Active Accounts, DC=egpaf, DC=com")
-		l = list(q.get_results())
+		l = sort(list(q.get_results()))
 		qs = [x[0].split('=')[1] for x in [[x for x in a if x.startswith("CN=")] for a in [x.split(',') for x in [x['distinguishedName'] for x in l]]] if x] #Employee.objects.all()
 		return qs
 
