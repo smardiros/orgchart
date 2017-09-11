@@ -27,7 +27,7 @@ class ManagerAutocomplete(autocomplete.Select2QuerySetView):
         qs = Employee.objects.all()
 
         if self.q:
-            qs = qs.filter(name__istartswith=self.q)
+            qs = qs.filter(name__icontains=self.q)
 
         return qs
 
@@ -39,8 +39,8 @@ class UserAutocomplete(autocomplete.Select2ListView):
 		pythoncom.CoInitialize()
 		q = pyad.adquery.ADQuery(options=dict(ldap_server="dc-net1.egpaf.com"))
 		q.execute_query(attributes = ["distinguishedName", "description"], base_dn = "OU= - Washington DC, OU=EGPAF Users - Active Accounts, DC=egpaf, DC=com")
-		l = sort(list(q.get_results()))
-		qs = [x[0].split('=')[1] for x in [[x for x in a if x.startswith("CN=")] for a in [x.split(',') for x in [x['distinguishedName'] for x in l]]] if x] #Employee.objects.all()
+		l = list(q.get_results())
+		qs = [x for x in [x[0].split('=')[1] for x in [[x for x in a if x.startswith("CN=")] for a in [x.split(',') for x in [x['distinguishedName'] for x in l]]] if x] if any(l.isupper() for l in x)] #Employee.objects.all()
 		return qs
 
     	#[x[0].split('=')[1] for x in [[x for x in a if x.startswith("CN=")] for a in [x.split(',') for x in [x['distinguishedName'] for x in l]]] if x]
