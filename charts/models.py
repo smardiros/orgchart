@@ -1,5 +1,11 @@
 from django.db import models
 import os
+from dal import autocomplete
+
+from django import forms
+
+from django.contrib import admin
+
 
 import orgchart.settings as settings
 
@@ -11,6 +17,7 @@ color_choices = (
 	("teal", 'Teal'),
 	("olive", 'Olive'),
 )
+
 
 class Employee(models.Model):
 	employee_id = models.AutoField(primary_key=True)

@@ -4,6 +4,10 @@ from django.shortcuts import render
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.clickjacking import xframe_options_exempt
+import pyad
+from pyad import aduser, pyadexceptions
+from dal import autocomplete
+
 
 
 
@@ -11,7 +15,25 @@ from .models import Employee, Department
 import os
 import json
 
+import pythoncom
 
+
+class UserAutocomplete(autocomplete.Select2QuerySetView):
+	def get_queryset(self):
+		# Don't forget to filter out results depending on the visitor !
+		# if not self.request.user.is_authenticated():
+		#     return Country.objects.none()
+		pythoncom.CoInitialize()
+		q = pyad.adquery.ADQuery(options=dict(ldap_server="dc-net1.egpaf.com"))
+		q.execute_query(attributes = ["distinguishedName", "description"], base_dn = "OU= - Washington DC, OU=EGPAF Users - Active Accounts, DC=egpaf, DC=com")
+		#l = list(q.get_results())
+		qs = Employee.objects.all()#[x[0].split('=')[1] for x in [[x for x in a if x.startswith("CN=")] for a in [x.split(',') for x in [x['distinguishedName'] for x in l]]] if x] #Employee.objects.all()
+
+    	#[x[0].split('=')[1] for x in [[x for x in a if x.startswith("CN=")] for a in [x.split(',') for x in [x['distinguishedName'] for x in l]]] if x]
+
+		if self.q:
+			qs = qs.filter(name__istartswith=self.q)
+		return qs
 
 def add_to_tree(tree, employee, e_id):
 	for _id, tree_employee in tree.items():
@@ -49,7 +71,7 @@ def director_department(employee):
 
 def department_dict(department):
 	employees_list = Employee.objects.filter(departments__in=[department])
-
+	pythoncom.CoInitialize()
 	director = department.director
 	#print(director, "\n\n")
 	
@@ -60,14 +82,21 @@ def department_dict(department):
 	# 	employees_id[employee.name] = employee.employees_id
 	# 	if employee.DepManager:
 
-
+	
 
 	for employee in employees_list:
 		if employee.name != director.name:
-			#print(employee)
+			try:
+				user = aduser.ADUser.from_cn(employee.name, options=dict(ldap_server="dc-net1.egpaf.com"))
+				title = user.description
+			except pyadexceptions.invalidResults as e:
+				title = employee.title
+				print(employee.name + str(e))
+				pass
+			print(title)
 			employees_id[employee.name] = employee.employee_id
 			manager_id = employee.manager.employee_id
-			employees_dict[employee.employee_id] = {"name": employee.name, "title": employee.title, "className": "", "manager" : manager_id, "collapsed": employee.collapse, "sub" : {}, "department": department.name}
+			employees_dict[employee.employee_id] = {"name": employee.name, "title": title, "className": "", "manager" : manager_id, "collapsed": employee.collapse, "sub" : {}, "department": department.name}
 			#print(employee, " ", employee.manager)
 			sub_director = director_department(employee)
 			color = " "
@@ -100,7 +129,15 @@ def department_dict(department):
 
 
 	#print(employees_dict)
-	dir_entry = {"name": director.name, "title": director.title, "className": "", "collapsed": director.collapse, "sub" : {}, "department": department.name}
+	try:
+		user = aduser.ADUser.from_cn(director.name, options=dict(ldap_server="dc-net1.egpaf.com"))
+		title = user.description
+	except pyadexceptions.invalidResults as e:
+		title = director.title
+		print(director.name + str(e))
+		pass
+	print(title)
+	dir_entry = {"name": director.name, "title": title, "className": "", "collapsed": director.collapse, "sub" : {}, "department": department.name}
 	if director.color is not None:
 		dir_entry["className"] += " " + director.color
 	elif department.color is not None:
@@ -151,8 +188,7 @@ def index(request):
 
 	print(department)
 	return render(request, 'charts/index.html', context)
-	
-@xframe_options_exempt
+
 def embed(request):
 	departments_list = Department.objects.all()
 

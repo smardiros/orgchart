@@ -1,8 +1,23 @@
 from django.contrib import admin
 from .models import Employee, Department
+from dal import autocomplete
+
+from django import forms
+
+class EmployeeForm(forms.ModelForm):
+    manager = forms.ModelChoiceField(
+        queryset=Employee.objects.all(),
+        widget=autocomplete.ModelSelect2(url='un-autocomplete')
+    )
+
+    class Meta:
+        model = Employee
+        fields = ('__all__')
+
 
 class EmployeeAdmin(admin.ModelAdmin):
     list_display = ('name', 'get_departments', 'title')
+    form = EmployeeForm
 
     def get_departments(self, obj):
     	return ", ".join([p.name for p in obj.departments.all()])
