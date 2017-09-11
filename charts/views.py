@@ -18,22 +18,32 @@ import json
 import pythoncom
 
 
-class UserAutocomplete(autocomplete.Select2QuerySetView):
-	def get_queryset(self):
+class ManagerAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        if not self.request.user.is_authenticated():
+            return Employee.objects.none()
+
+        qs = Employee.objects.all()
+
+        if self.q:
+            qs = qs.filter(name__istartswith=self.q)
+
+        return qs
+
+class UserAutocomplete(autocomplete.Select2ListView):
+	def get_list(self):
 		# Don't forget to filter out results depending on the visitor !
-		# if not self.request.user.is_authenticated():
-		#     return Country.objects.none()
+		if not self.request.user.is_authenticated():
+		    return []
 		pythoncom.CoInitialize()
 		q = pyad.adquery.ADQuery(options=dict(ldap_server="dc-net1.egpaf.com"))
 		q.execute_query(attributes = ["distinguishedName", "description"], base_dn = "OU= - Washington DC, OU=EGPAF Users - Active Accounts, DC=egpaf, DC=com")
-		#l = list(q.get_results())
-		qs = Employee.objects.all()#[x[0].split('=')[1] for x in [[x for x in a if x.startswith("CN=")] for a in [x.split(',') for x in [x['distinguishedName'] for x in l]]] if x] #Employee.objects.all()
+		l = list(q.get_results())
+		qs = [x[0].split('=')[1] for x in [[x for x in a if x.startswith("CN=")] for a in [x.split(',') for x in [x['distinguishedName'] for x in l]]] if x] #Employee.objects.all()
+		return qs
 
     	#[x[0].split('=')[1] for x in [[x for x in a if x.startswith("CN=")] for a in [x.split(',') for x in [x['distinguishedName'] for x in l]]] if x]
-
-		if self.q:
-			qs = qs.filter(name__istartswith=self.q)
-		return qs
 
 def add_to_tree(tree, employee, e_id):
 	for _id, tree_employee in tree.items():

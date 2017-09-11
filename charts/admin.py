@@ -5,9 +5,14 @@ from dal import autocomplete
 from django import forms
 
 class EmployeeForm(forms.ModelForm):
+    name = autocomplete.Select2ListChoiceField(
+        choice_list=Employee.objects.all(),
+        widget=autocomplete.ListSelect2(url='name-autocomplete')
+    )
+
     manager = forms.ModelChoiceField(
         queryset=Employee.objects.all(),
-        widget=autocomplete.ModelSelect2(url='un-autocomplete')
+        widget=autocomplete.ModelSelect2(url='manager-autocomplete')
     )
 
     class Meta:
