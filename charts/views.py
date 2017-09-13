@@ -114,6 +114,7 @@ def department_dict(department):
             employees_id[employee.name] = employee.employee_id
             manager_id = employee.manager.employee_id
             employees_dict[employee.employee_id] = {"name": employee.name, "title": title, "className": "", "manager" : manager_id, "collapsed": employee.collapse, "sub" : {}, "department": department.name}
+            #print(employees_dict[employee.employee_id])
             #print(employee, " ", employee.manager)
             sub_director = director_department(employee)
             color = " "
@@ -129,7 +130,8 @@ def department_dict(department):
 
             employees_dict[employee.employee_id]["className"] += color
 
-            if sub_director is not None:
+            if len(sub_director) > 0:
+                print("subdirector : " + employee.name)
                 #print(len(sub_director))
                 if len(sub_director) == 1:
                     dep = sub_director[0]
@@ -153,7 +155,7 @@ def department_dict(department):
         title = director.title
         print(director.name + str(e))
         pass
-    print(title)
+
     dir_entry = {"name": director.name, "title": title, "className": "", "collapsed": director.collapse, "sub" : {}, "department": department.name}
     if director.color is not None:
         dir_entry["className"] += " " + director.color
@@ -182,8 +184,8 @@ def department_dict(department):
 
         #print(employees_dict)
 
-
-    #print(tree)
+    print("tree:")
+    print(tree)
 
     return dict_to_json_format(tree)    
 
@@ -203,7 +205,7 @@ def index(request):
     if (department):
         context['department']=str(department)
 
-    print(department)
+
     return render(request, 'charts/index.html', context)
 
     
