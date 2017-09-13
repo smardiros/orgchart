@@ -628,12 +628,10 @@
     var $nodeDiv = $('<div' + (opts.draggable ? ' draggable="true"' : '') + (nodeData[opts.nodeId] ? ' id="' + nodeData[opts.nodeId] + '"' : '') + (nodeData.parentId ? ' data-parent="' + nodeData.parentId + '"' : '') + '>')
       .addClass('node ' + (nodeData.className || '') +  (level >= opts.depth ? ' slide-up' : ''))
       .append('<div class="title">' + nodeData[opts.nodeTitle] + '</div>')
-      .append(typeof opts.nodeContent !== 'undefined' ? '<div class="content">' + (nodeData[opts.nodeContent] || '') + '<img class= \'profile img-circle\' src=' + nodeData.picture + '></img></div>' : '');
+      .append(typeof opts.nodeContent !== 'undefined' ? '<div class="content"><div>' + (nodeData[opts.nodeContent] + '</div>' || '') + '<img class= \'profile img-circle\' src=' + nodeData.picture + '></img></div>' : '');
     // append 4 direction arrows or expand/collapse buttons
     var flags = nodeData.relationship || '';
-    if (nodeData.className.includes('picture')){
-      $nodeDiv.append('<i src=../' + nodeData.picture + '></i>');
-    }
+
     if (opts.verticalDepth && (level + 2) > opts.verticalDepth) {
       if ((level + 1) >= opts.verticalDepth && Number(flags.substr(2,1))) {
         var icon = level + 1  >= opts.depth ? 'plus' : 'minus';

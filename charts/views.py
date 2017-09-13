@@ -87,7 +87,11 @@ def director_department(employee):
     return department
 
 def department_dict(department):
-    employees_list = Employee.objects.filter(departments__in=[department])
+    print(department.abbr)
+    if department.abbr != "egpaf":
+        employees_list = Employee.objects.filter(departments__in=[department])
+    else:
+        employees_list = Employee.objects.all()
     pythoncom.CoInitialize()
     director = department.director
     #print(director, "\n\n")
@@ -198,6 +202,8 @@ def index(request):
     for department in departments_list:
 
         out.append([department.abbr, json.dumps(department_dict(department)[0]), department.name])
+
+
 
     template = loader.get_template('charts/index.html')
     context = { 'employees_tree':out}
