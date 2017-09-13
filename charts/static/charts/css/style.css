@@ -133,7 +133,7 @@ body {
 
 .orgchart .down {
   left: 80px;
-  top: 60px;
+  top: 80px;
 }
 
 .orgchart .up {
@@ -157,6 +157,16 @@ body {
 
 .orgchart .node {
   width: 180px;
+  height: 100px;
+}
+
+.profile {
+/*  border-radius: 50%;*/
+  /*width: 100%;*/
+  margin: auto;
+  max-height:50px;
+  width: auto;
+  height: auto;
 }
 
 .orgchart .node:hover .drill-icon {
@@ -164,7 +174,8 @@ body {
 }
 
 
-.orgchart {
+.orgchart .node .content {
+  height: 75px;
   /* background: #fff; */
 }
 .orgchart td.left, .orgchart td.right, .orgchart td.top {

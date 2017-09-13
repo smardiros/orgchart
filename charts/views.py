@@ -43,6 +43,7 @@ class ManagerAutocomplete(autocomplete.Select2QuerySetView):
 class UserAutocomplete(autocomplete.Select2ListView):
     def create(self, text):
         return text
+        
     def get_list(self):
         # Don't forget to filter out results depending on the visitor !
         if not self.request.user.is_authenticated():
@@ -205,6 +206,8 @@ def index(request):
     print(department)
     return render(request, 'charts/index.html', context)
 
+    
+@xframe_options_exempt
 def embed(request):
     departments_list = Department.objects.all()
 
