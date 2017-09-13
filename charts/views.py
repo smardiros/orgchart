@@ -62,19 +62,21 @@ def add_to_tree(tree, employee, e_id):
 
     return False
 
-def dict_to_json_format(employees, collapsed=False):
-
+def dict_to_json_format(employees, collapsed=False, showall=False):
+    print(showall)
     json = []
     for _id, employee in employees.items():
         sub = employee.pop("sub")
         json.append(employee)
 
 
-        if collapsed:
+        if collapsed and not showall:
             json[-1]["className"] += " slide-up"
 
-
-        children = dict_to_json_format(sub,employee["collapsed"])
+        if showall:
+            json[-1]["collapsed"] = False
+            
+        children = dict_to_json_format(sub,employee["collapsed"],showall)
         
         if children:
             json[-1]["children"] = children
@@ -134,7 +136,7 @@ def department_dict(department):
 
             employees_dict[employee.employee_id]["className"] += color
 
-            if len(sub_director) > 0:
+            if len(sub_director) > 0 and department.abbr != "egpaf":
                 print("subdirector : " + employee.name)
                 #print(len(sub_director))
                 if len(sub_director) == 1:
@@ -191,7 +193,7 @@ def department_dict(department):
     print("tree:")
     print(tree)
 
-    return dict_to_json_format(tree)    
+    return dict_to_json_format(tree, showall=(department.abbr == "egpaf"))    
 
 
 def index(request):
