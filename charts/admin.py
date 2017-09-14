@@ -43,6 +43,7 @@ class DepartmentAdmin(admin.ModelAdmin):
     list_display = ('name', 'director')
     form = DepartmentForm
 
+
 # Register your models here.
 admin.site.register(Employee, EmployeeAdmin)
 admin.site.register(Department, DepartmentAdmin)

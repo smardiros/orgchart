@@ -75,7 +75,9 @@
         if ($node.is('.picture')) {
           var url = data.picture;
         }
-      }
+      },
+    'exportButton': true,
+    'exportFilename': 'MyOrgChart',
     });
     $('#chart-title').html("<p>" + get_department(rootClass) + "</p>");
     var savebutton = document.createElement('button');

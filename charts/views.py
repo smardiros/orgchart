@@ -11,7 +11,7 @@ from dal import autocomplete
 
 
 
-from .models import Employee, Department
+from .models import Employee, Department, Team
 import os
 import json
 
@@ -27,7 +27,7 @@ def getADNames():
     #qs = [x for x in qs if x.translate({ord(c): None for c in ' -.'}).isalpha()]
     return sorted(qs)
 
-class ManagerAutocomplete(autocomplete.Select2QuerySetView):
+class EmployeeAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
         if not self.request.user.is_authenticated():
@@ -236,6 +236,17 @@ def embed(request):
     print(department)
     return render(request, 'charts/embed.html', context)
 
+
+
+# def team(request):
+#     t = request.GET.get('team', '')
+#     team = list(Team.objects.filter(name=t))[0]
+
+
+#     manager = {"name": team.manager.name, "title": title, "className": "", "manager" : manager_id, "collapsed": employee.collapse, "sub" : {}, "department": department.name}
+
+#     for member in team.members.all():
+#         if member.name != direct
 
 
 def dict_to_list(employee_dict, manager=None):

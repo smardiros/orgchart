@@ -46,3 +46,12 @@ class Department(models.Model):
 
 	def __str__(self):
 		return self.name
+
+class Team(models.Model):
+	name = models.CharField(max_length=100)
+	description = models.CharField(max_length=400)
+	manager = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, related_name="team_members")
+	members = models.ManyToManyField(Employee)
+
+	def __str__(self):
+		return self.name
