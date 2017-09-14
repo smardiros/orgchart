@@ -134,6 +134,8 @@ def department_dict(department):
                 employees_dict[employee.employee_id]["picture"] = employee.picture.url
                 employees_dict[employee.employee_id]["className"] += " picture"
 
+
+
             employees_dict[employee.employee_id]["className"] += color
 
             if len(sub_director) > 0 and department.abbr != "egpaf":
@@ -215,6 +217,7 @@ def index(request):
 
 
     return render(request, 'charts/index.html', context)
+
 
     
 @xframe_options_exempt

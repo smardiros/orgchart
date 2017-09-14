@@ -139,8 +139,10 @@
               $chartContainer.find('.mask').addClass('hidden');
               if (opts.exportFileextension.toLowerCase() === 'pdf') {
                 var doc = {};
-                var docWidth = Math.floor(canvas.width * 0.2646);
-                var docHeight = Math.floor(canvas.height * 0.2646);
+                //var docWidth = Math.floor(canvas.width * 0.2646);
+                //var docHeight = Math.floor(canvas.height * 0.2646);
+                var docWidth = Math.floor(canvas.width * 0.4);
+                var docHeight = Math.floor(canvas.height * 0.4);
                 if (docWidth > docHeight) {
                   doc = new jsPDF('l', 'mm', [docWidth, docHeight]);
                 } else {
@@ -628,7 +630,7 @@
     var $nodeDiv = $('<div' + (opts.draggable ? ' draggable="true"' : '') + (nodeData[opts.nodeId] ? ' id="' + nodeData[opts.nodeId] + '"' : '') + (nodeData.parentId ? ' data-parent="' + nodeData.parentId + '"' : '') + '>')
       .addClass('node ' + (nodeData.className || '') +  (level >= opts.depth ? ' slide-up' : ''))
       .append('<div class="title">' + nodeData[opts.nodeTitle] + '</div>')
-      .append(typeof opts.nodeContent !== 'undefined' ? '<div class="content"><div>' + (nodeData[opts.nodeContent] + '</div>' || '') + '<img class= \'profile img-circle\' src=' + nodeData.picture + '></img></div>' : '');
+      .append(typeof opts.nodeContent !== 'undefined' ? '<div class="content"><div>' + (nodeData[opts.nodeContent] + '</div>' || '') + (typeof nodeData.picture !== 'undefined' ? '<img class= "profile img-circle" src=' + nodeData.picture + '></img>' : '') + '</div>' : '');
     // append 4 direction arrows or expand/collapse buttons
     var flags = nodeData.relationship || '';
 

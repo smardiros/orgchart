@@ -13,7 +13,7 @@ class EmployeeForm(forms.ModelForm):
 
     manager = forms.ModelChoiceField(
         queryset=Employee.objects.all(),
-        widget=autocomplete.ModelSelect2(url='manager-autocomplete')
+        widget=autocomplete.ModelSelect2(url='employee-autocomplete')
     )
 
     class Meta:
@@ -31,7 +31,7 @@ class EmployeeAdmin(admin.ModelAdmin):
 class DepartmentForm(forms.ModelForm):
     director = forms.ModelChoiceField(
         queryset=Employee.objects.all(),
-        widget=autocomplete.ModelSelect2(url='manager-autocomplete')
+        widget=autocomplete.ModelSelect2(url='employee-autocomplete')
     )
 
     class Meta:
