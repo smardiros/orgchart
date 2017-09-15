@@ -21,9 +21,10 @@ import pythoncom
 def getADNames():
     pythoncom.CoInitialize()
     q = pyad.adquery.ADQuery(options=dict(ldap_server="dc-net1.egpaf.com"))
-    q.execute_query(attributes = ["distinguishedName", "description"], base_dn = "OU= - Washington DC, OU=EGPAF Users - Active Accounts, DC=egpaf, DC=com")
+    q.execute_query(attributes = ["displayName", "description", "telephoneNumber", "logonCount"], base_dn = "OU= - Washington DC, OU=EGPAF Users - Active Accounts, DC=egpaf, DC=com")
     l = list(q.get_results())
-    qs = [x for x in [x[0].split('=')[1] for x in [[x for x in a if x.startswith("CN=")] for a in [x.split(',') for x in [x['distinguishedName'] for x in l]]] if x] if any(l.isupper() for l in x)] #Employee.objects.all()
+    #qs = [x for x in [x[0].split('=')[1] for x in [[x for x in a if x.startswith("CN=")] for a in [x.split(',') for x in [x['distinguishedName'] for x in l]]] if x] if any(l.isupper() for l in x)] #Employee.objects.all()
+    qs = [x["displayName"] for x in l if x["displayName"] is not None and x["logonCount"] and any(c.isupper() for c in x["displayName"])]
     #qs = [x for x in qs if x.translate({ord(c): None for c in ' -.'}).isalpha()]
     return sorted(qs)
 
@@ -112,6 +113,8 @@ def department_dict(department):
             try:
                 user = aduser.ADUser.from_cn(employee.name, options=dict(ldap_server="dc-net1.egpaf.com"))
                 title = user.description
+                phone = user.telephoneNumber
+                dep = user.department
             except pyadexceptions.invalidResults as e:
                 title = employee.title
                 print(employee.name + str(e))

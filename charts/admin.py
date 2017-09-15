@@ -44,10 +44,15 @@ class DepartmentAdmin(admin.ModelAdmin):
     form = DepartmentForm
 
 class TeamForm(forms.ModelForm):
-    members = forms.ModelChoiceField(
+    manager = forms.ModelChoiceField(
         queryset=Employee.objects.all(),
-        widget=autocomplete.ModelSelect2Multiple(url='employee-autocomplete')
+        widget=autocomplete.ModelSelect2(url='employee-autocomplete')
     )
+    
+    # members = forms.ModelChoiceField(
+    #     queryset=Employee.objects.all(),
+    #     widget=autocomplete.ModelSelect2Multiple(url='employee-autocomplete')
+    # )
 
 
     class Meta:
