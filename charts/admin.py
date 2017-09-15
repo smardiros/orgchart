@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Employee, Department
+from .models import Employee, Department, Team
 from .views import getADNames
 from dal import autocomplete
 
@@ -43,7 +43,22 @@ class DepartmentAdmin(admin.ModelAdmin):
     list_display = ('name', 'director')
     form = DepartmentForm
 
+class TeamForm(forms.ModelForm):
+    members = forms.ModelChoiceField(
+        queryset=Employee.objects.all(),
+        widget=autocomplete.ModelSelect2Multiple(url='employee-autocomplete')
+    )
+
+
+    class Meta:
+        model = Team
+        fields = ('__all__')
+
+class TeamAdmin(admin.ModelAdmin):
+    form = TeamForm
+
 
 # Register your models here.
+admin.site.register(Team, TeamAdmin)
 admin.site.register(Employee, EmployeeAdmin)
 admin.site.register(Department, DepartmentAdmin)
