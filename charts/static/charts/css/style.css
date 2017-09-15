@@ -44,6 +44,14 @@ body {
   text-align: center;
 }
 
+.details-table {
+  width: 100%;
+}
+
+.details-table .td {
+  width: 50%;
+}
+
 .heading {
   font-size: 20px;
   z-index: 1000;
@@ -168,6 +176,8 @@ body {
   width: auto;
   height: auto;
 }
+
+
 
 .orgchart .node:hover .drill-icon {
   opacity: 1;

@@ -21,7 +21,7 @@ import pythoncom
 def getADNames():
     pythoncom.CoInitialize()
     q = pyad.adquery.ADQuery(options=dict(ldap_server="dc-net1.egpaf.com"))
-    q.execute_query(attributes = ["displayName", "description", "telephoneNumber", "logonCount"], base_dn = "OU= - Washington DC, OU=EGPAF Users - Active Accounts, DC=egpaf, DC=com")
+    q.execute_query(attributes = ["displayName", "description", "telephoneNumber", "logonCount","mail","department"], base_dn = "OU= - Washington DC, OU=EGPAF Users - Active Accounts, DC=egpaf, DC=com")
     l = list(q.get_results())
     #qs = [x for x in [x[0].split('=')[1] for x in [[x for x in a if x.startswith("CN=")] for a in [x.split(',') for x in [x['distinguishedName'] for x in l]]] if x] if any(l.isupper() for l in x)] #Employee.objects.all()
     qs = [x["displayName"] for x in l if x["displayName"] is not None and x["logonCount"] and any(c.isupper() for c in x["displayName"])]
@@ -112,6 +112,7 @@ def department_dict(department):
         if employee.name != director.name:
             try:
                 user = aduser.ADUser.from_cn(employee.name, options=dict(ldap_server="dc-net1.egpaf.com"))
+                mail = user.mail
                 title = user.description
                 phone = user.telephoneNumber
                 dep = user.department
@@ -122,7 +123,8 @@ def department_dict(department):
             print(title)
             employees_id[employee.name] = employee.employee_id
             manager_id = employee.manager.employee_id
-            employees_dict[employee.employee_id] = {"name": employee.name, "title": title, "className": "", "manager" : manager_id, "collapsed": employee.collapse, "sub" : {}, "department": department.name}
+            employees_dict[employee.employee_id] = {"name": employee.name, "title": title, "className": "", "manager" : manager_id, "collapsed": employee.collapse, "sub" : {}, "department": department.name, "details": {}}
+            employees_dict[employee.employee_id]["details"] = {"mail" : mail, "phone" : phone, "department" : dep}
             #print(employees_dict[employee.employee_id])
             #print(employee, " ", employee.manager)
             sub_director = director_department(employee)
@@ -199,6 +201,8 @@ def department_dict(department):
     print(tree)
 
     return dict_to_json_format(tree, showall=(department.abbr == "egpaf"))    
+
+
 
 
 def index(request):

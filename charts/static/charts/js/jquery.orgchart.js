@@ -685,7 +685,7 @@
       } else {
         $('#pic-container').html('');
       }
-      $('#profile-container').html('<b>' + nodeData.name + '</b>');
+      $('#profile-container').html('<p><b>' + nodeData.name + '</b></p><table class=\'details-table\'><tr><td><b> Phone number </b></td><td>' + nodeData.details.phone + '</td></tr></table>');
       var profilesavebutton = document.createElement('button');
       profilesavebutton.innerHTML = 'Save';
       profilesavebutton.onclick = function(){
