@@ -164,12 +164,17 @@ def department_dict(department):
     try:
         user = aduser.ADUser.from_cn(director.name, options=dict(ldap_server="dc-net1.egpaf.com"))
         title = user.description
+        mail = user.mail
+        title = user.description
+        phone = user.telephoneNumber
+        dep = user.department
     except pyadexceptions.invalidResults as e:
         title = director.title
         print(director.name + str(e))
         pass
 
     dir_entry = {"name": director.name, "title": title, "className": "", "collapsed": director.collapse, "sub" : {}, "department": department.name}
+    dir_entry["details"] = {"mail" : mail, "phone" : phone, "department" : dep}
     if director.color is not None:
         dir_entry["className"] += " " + director.color
     elif department.color is not None:
