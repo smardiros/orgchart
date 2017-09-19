@@ -685,13 +685,16 @@
       } else {
         $('#pic-container').html('');
       }
-      $('#profile-container').html('<p><b>' + nodeData.name + '</b></p><table class=\'details-table\'><tr><td><b> Phone number </b></td><td>' + nodeData.details.phone + '</td></tr></table>');
-      var profilesavebutton = document.createElement('button');
-      profilesavebutton.innerHTML = 'Save';
-      profilesavebutton.onclick = function(){
-        alert('not saving yet!')
-      };
-      document.getElementById('profile-save-button').replaceChild(profilesavebutton, document.getElementById('profile-save-button').childNodes[0]);
+      $('#profile-container').html('<p><b>' + nodeData.name + '</b></p><table class=\'details-table table table-hover\'>'+
+        '<tr><td><b> Phone number </b></td><td>' + nodeData.details.phone + '</td></tr>' +
+        '<tr><td><b> Email </b></td><td>' + nodeData.details.mail + '</td></tr>' +
+        '<tr><td><b> Department </b></td><td>' + nodeData.details.department + '</td></tr></table>');
+      // var profilesavebutton = document.createElement('button');
+      // profilesavebutton.innerHTML = 'Save';
+      // profilesavebutton.onclick = function(){
+      //   alert('not saving yet!')
+      // };
+      // document.getElementById('profile-save-button').replaceChild(profilesavebutton, document.getElementById('profile-save-button').childNodes[0]);
     });
 
     // define click event handler for the top edge
