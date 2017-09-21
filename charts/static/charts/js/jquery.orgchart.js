@@ -687,7 +687,7 @@
       }
       $('#profile-container').html('<p><b>' + nodeData.name + '</b></p><table class=\'details-table table table-hover\'>'+
         '<tr><td><b> Phone number </b></td><td>' + nodeData.details.phone + '</td></tr>' +
-        '<tr><td><b> Email </b></td><td>' + nodeData.details.mail + '</td></tr>' +
+        '<tr><td><b> Email </b></td><td><a href="mailto:' + nodeData.details.mail + '">' + nodeData.details.mail + '</a></td></tr>' +
         '<tr><td><b> Department </b></td><td>' + nodeData.details.department + '</td></tr></table>');
       // var profilesavebutton = document.createElement('button');
       // profilesavebutton.innerHTML = 'Save';

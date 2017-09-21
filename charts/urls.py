@@ -3,6 +3,7 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
+
 	url(r'^name-autocomplete/$', views.UserAutocomplete.as_view(), name='name-autocomplete'),
 	url(r'^employee-autocomplete/$', views.EmployeeAutocomplete.as_view(), name='employee-autocomplete'),
 	# url(r'^teams/$', views.team, name='team'),

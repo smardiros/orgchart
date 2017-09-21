@@ -165,12 +165,14 @@ body {
 
 .orgchart .node {
   width: 180px;
-  height: 100px;
+  height: 130px;
 }
 
 .profile {
 /*  border-radius: 50%;*/
   /*width: 100%;*/
+  position: absolute;
+  bottom: 0;
   margin: auto;
   max-height:50px;
   width: auto;
@@ -185,7 +187,7 @@ body {
 
 
 .orgchart .node .content {
-  height: 75px;
+  height: 105px;
   /* background: #fff; */
 }
 .orgchart td.left, .orgchart td.right, .orgchart td.top {
