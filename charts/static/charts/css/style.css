@@ -172,8 +172,8 @@ body {
 /*  border-radius: 50%;*/
   /*width: 100%;*/
   position: absolute;
-  bottom: 0;
-  margin: auto;
+  bottom: 15px;
+  left: 55px;
   max-height:50px;
   width: auto;
   height: auto;
