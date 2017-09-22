@@ -685,10 +685,15 @@
       } else {
         $('#pic-container').html('');
       }
-      $('#profile-container').html('<p><b>' + nodeData.name + '</b></p><table class=\'details-table table table-hover\'>'+
-        '<tr><td><b> Phone number </b></td><td>' + nodeData.details.phone + '</td></tr>' +
-        '<tr><td><b> Email </b></td><td><a href="mailto:' + nodeData.details.mail + '">' + nodeData.details.mail + '</a></td></tr>' +
-        '<tr><td><b> Department </b></td><td>' + nodeData.details.department + '</td></tr></table>');
+
+      if(Object.keys(nodeData.details).length !== 0){
+        $('#profile-container').html('<p><b>' + nodeData.name + '</b></p><table class=\'details-table table table-hover\'>'+
+          '<tr><td><b> Phone number </b></td><td>' + nodeData.details.phone + '</td></tr>' +
+          '<tr><td><b> Email </b></td><td><a href="mailto:' + nodeData.details.mail + '">' + nodeData.details.mail + '</a></td></tr>' +
+          '<tr><td><b> Department </b></td><td>' + nodeData.details.department + '</td></tr></table>');
+          } else {
+            $('#profile-container').html('<p><b>' + nodeData.name + '</b></p>');
+          }
       // var profilesavebutton = document.createElement('button');
       // profilesavebutton.innerHTML = 'Save';
       // profilesavebutton.onclick = function(){
