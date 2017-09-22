@@ -117,6 +117,7 @@ def department_dict(department):
                 phone = user.telephoneNumber
                 dep = user.department
             except pyadexceptions.invalidResults as e:
+                user = None
                 title = employee.title
                 print(employee.name + str(e))
                 pass
@@ -124,7 +125,8 @@ def department_dict(department):
             employees_id[employee.name] = employee.employee_id
             manager_id = employee.manager.employee_id
             employees_dict[employee.employee_id] = {"name": employee.name, "title": title, "className": "", "manager" : manager_id, "collapsed": employee.collapse, "sub" : {}, "department": department.name, "details": {}}
-            employees_dict[employee.employee_id]["details"] = {"mail" : mail, "phone" : phone, "department" : dep}
+            if user is not None:
+                employees_dict[employee.employee_id]["details"] = {"mail" : mail, "phone" : phone, "department" : dep}
             #print(employees_dict[employee.employee_id])
             #print(employee, " ", employee.manager)
             sub_director = director_department(employee)
@@ -169,12 +171,14 @@ def department_dict(department):
         phone = user.telephoneNumber
         dep = user.department
     except pyadexceptions.invalidResults as e:
+        user = None
         title = director.title
         print(director.name + str(e))
         pass
 
-    dir_entry = {"name": director.name, "title": title, "className": "", "collapsed": director.collapse, "sub" : {}, "department": department.name}
-    dir_entry["details"] = {"mail" : mail, "phone" : phone, "department" : dep}
+    dir_entry = {"name": director.name, "title": title, "className": "", "collapsed": director.collapse, "sub" : {}, "department": department.name, "details": {}}
+    if user is not None:
+        dir_entry["details"] = {"mail" : mail, "phone" : phone, "department" : dep}
     if director.color is not None:
         dir_entry["className"] += " " + director.color
     elif department.color is not None:
