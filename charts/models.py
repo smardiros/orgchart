@@ -26,6 +26,7 @@ class Employee(models.Model):
 	#displayclass = models.CharField(max_length=200, blank=True)
 	manager = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True)
 	departments = models.ManyToManyField('Department', blank=True)
+	teams = models.ManyToManyField('Team', blank=True)
 	collapse = models.BooleanField()
 	DepManager = models.BooleanField()
 
@@ -49,9 +50,11 @@ class Department(models.Model):
 
 class Team(models.Model):
 	name = models.CharField(max_length=100)
+	abbr = models.CharField(max_length=10)
 	description = models.CharField(max_length=400)
 	manager = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, related_name="team_members")
-	members = models.ManyToManyField(Employee)
+	permanent = models.BooleanField()
+	#members = models.ManyToManyField(Employee)
 
 	def __str__(self):
 		return self.name

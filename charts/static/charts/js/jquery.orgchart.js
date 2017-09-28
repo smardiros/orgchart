@@ -694,6 +694,30 @@
           } else {
             $('#profile-container').html('<p><b>' + nodeData.name + '</b></p>');
           }
+      if(nodeData.teams.permanent.length !== 0 || nodeData.teams.temporary.length !== 0){
+        var teams = '';
+        if(nodeData.teams.permanent.length !== 0){
+          teams += '<p><b>Permanent Teams</p></b><table class=\'details-table table table-hover\'>';
+          for(var t in nodeData.teams.permanent){
+            teams += '<tr><td><b>' + nodeData.teams.permanent[t].name +'</b></td></tr>';
+          }
+          teams += '</table>';
+        }
+        if(nodeData.teams.temporary.length !== 0){
+          teams += '<p><b>Temporary Teams</p></b><table class=\'details-table table table-hover\'>';
+          for(var t in nodeData.teams.temporary){
+            teams += '<tr><td><b>' + nodeData.teams.temporary[t].name +'</b></td></tr>';
+          }
+          teams += '</table>';
+        }
+        $('#teams-container').html(
+          teams
+        )
+      } else {
+        $('#teams-container').html(
+          ''
+        )
+      }
       // var profilesavebutton = document.createElement('button');
       // profilesavebutton.innerHTML = 'Save';
       // profilesavebutton.onclick = function(){

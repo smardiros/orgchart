@@ -124,7 +124,14 @@ def department_dict(department):
             print(title)
             employees_id[employee.name] = employee.employee_id
             manager_id = employee.manager.employee_id
-            employees_dict[employee.employee_id] = {"name": employee.name, "title": title, "className": "", "manager" : manager_id, "collapsed": employee.collapse, "sub" : {}, "department": department.name, "details": {}}
+            employees_dict[employee.employee_id] = {"name": employee.name, "title": title, "className": "", "manager" : manager_id, "collapsed": employee.collapse, "sub" : {}, "department": department.name, "details": {}, "teams":{ "permanent":[], "temporary":[]}}
+            
+            for team in employee.teams.all():
+                if team.permanent:
+                    employees_dict[employee.employee_id]["teams"]["permanent"].append({"name": team.name, "abbr": team.abbr})
+                else:
+                    employees_dict[employee.employee_id]["teams"]["temporary"].append({"name": team.name, "abbr": team.abbr})
+
             if user is not None:
                 employees_dict[employee.employee_id]["details"] = {"mail" : mail, "phone" : phone, "department" : dep}
             #print(employees_dict[employee.employee_id])
@@ -176,7 +183,13 @@ def department_dict(department):
         print(director.name + str(e))
         pass
 
-    dir_entry = {"name": director.name, "title": title, "className": "", "collapsed": director.collapse, "sub" : {}, "department": department.name, "details": {}}
+    dir_entry = {"name": director.name, "title": title, "className": "", "collapsed": director.collapse, "sub" : {}, "department": department.name, "details": {}, "teams":{ "permanent":[], "temporary":[]}}
+    for team in director.teams.all():
+        if team.permanent:
+            dir_entry["teams"]["permanent"].append({"name": team.name, "abbr": team.abbr})
+        else:
+            dir_entry["teams"]["temporary"].append({"name": team.name, "abbr": team.abbr})
+
     if user is not None:
         dir_entry["details"] = {"mail" : mail, "phone" : phone, "department" : dep}
     if director.color is not None:
@@ -206,16 +219,140 @@ def department_dict(department):
 
         #print(employees_dict)
 
-    print("tree:")
-    print(tree)
 
-    return dict_to_json_format(tree, showall=(department.abbr == "egpaf"))    
+    return dict_to_json_format(tree, showall=(department.abbr == "egpaf"))   
+    
+def team_dict(team):
+    employees_list = Employee.objects.filter(teams=team)
+    pythoncom.CoInitialize()
+    manager = team.manager
 
 
+    employees_dict = {}
+    employees_id = {}
+
+    for employee in employees_list:
+        if employee.name != manager.name:
+            try:
+                user = aduser.ADUser.from_cn(employee.name, options=dict(ldap_server="dc-net1.egpaf.com"))
+                mail = user.mail
+                title = user.description
+                phone = user.telephoneNumber
+                dep = user.department
+            except pyadexceptions.invalidResults as e:
+                user = None
+                title = employee.title
+                print(employee.name + str(e))
+                pass
+            print(title)
+            employees_id[employee.name] = employee.employee_id
+            manager_id = manager.employee_id
+            employees_dict[employee.employee_id] = {"name": employee.name, "title": title, "className": "", "manager" : manager_id, "collapsed": False, "sub" : {}, "details": {}, "teams":{ "permanent":[], "temporary":[]}}
+            
+            for team in employee.teams.all():
+                if team.permanent:
+                    employees_dict[employee.employee_id]["teams"]["permanent"].append({"name": team.name, "abbr": team.abbr})
+                else:
+                    employees_dict[employee.employee_id]["teams"]["temporary"].append({"name": team.name, "abbr": team.abbr})
+
+            if user is not None:
+                employees_dict[employee.employee_id]["details"] = {"mail" : mail, "phone" : phone, "department" : dep}
+            #print(employees_dict[employee.employee_id])
+            #print(employee, " ", employee.manager)
+            sub_director = director_department(employee)
+            color = " "
+            if employee.color is not None:
+                color += employee.color 
+
+
+            if employee.picture.name:
+                #print("picture + ", employee.picture)
+                employees_dict[employee.employee_id]["picture"] = employee.picture.url
+                employees_dict[employee.employee_id]["className"] += " picture"
+
+    try:
+        user = aduser.ADUser.from_cn(manager.name, options=dict(ldap_server="dc-net1.egpaf.com"))
+        title = user.description
+        mail = user.mail
+        title = user.description
+        phone = user.telephoneNumber
+        dep = user.department
+    except pyadexceptions.invalidResults as e:
+        user = None
+        title = manager.title
+        print(manager.name + str(e))
+        pass
+
+    manager_entry = {"name": manager.name, "title": title, "className": "", "collapsed": False, "sub" : {}, "details": {}, "teams":{ "permanent":[], "temporary":[]}}
+    for team in manager.teams.all():
+        if team.permanent:
+            manager_entry["teams"]["permanent"].append({"name": team.name, "abbr": team.abbr})
+        else:
+            manager_entry["teams"]["temporary"].append({"name": team.name, "abbr": team.abbr})
+
+    try:
+        user = aduser.ADUser.from_cn(manager.name, options=dict(ldap_server="dc-net1.egpaf.com"))
+        title = user.description
+        mail = user.mail
+        title = user.description
+        phone = user.telephoneNumber
+        dep = user.department
+    except pyadexceptions.invalidResults as e:
+        user = None
+        title = director.title
+        print(director.name + str(e))
+        pass
+
+    if user is not None:
+        manager_entry["details"] = {"mail" : mail, "phone" : phone, "department" : dep}
+    if manager.color is not None:
+        manager_entry["className"] += " " + manager.color
+
+
+    if manager.picture.name:
+        manager_entry["picture"] = manager.picture.url
+        manager_entry["className"] += " picture"
+
+
+    tree = {manager.employee_id : manager_entry}
+    employees_dict.pop(manager.employee_id, None)
+    while len(employees_dict) > 0:
+        pop = []
+        for _id, employee in employees_dict.items():
+            if add_to_tree(tree, employee, _id):
+                pop.append(_id)        
+        for _id in pop:
+            employees_dict.pop(_id, None)
+
+
+    return dict_to_json_format(tree)
+
+
+def team(request):
+    departments_list = Department.objects.all()
+    teams_list = Team.objects.all()
+
+    out = []
+
+    for team in teams_list:
+
+        out.append([team.abbr, json.dumps(team_dict(team)[0]), team.name])
+
+    dep_out = []
+    for dep in departments_list:
+        dep_out.append([dep.abbr, '', dep.name])    
+
+    template = loader.get_template('charts/index.html')
+    context = { 'departments_tree':dep_out, 'teams_tree' : out}
+    team = request.GET.get('t', '')
+    if (team):
+        context['team']=str(team)
+    return render(request, 'charts/team.html', context)
 
 
 def index(request):
     departments_list = Department.objects.all()
+    teams_list = Team.objects.all()
 
     out = []
 
@@ -223,15 +360,17 @@ def index(request):
 
         out.append([department.abbr, json.dumps(department_dict(department)[0]), department.name])
 
-
+    teams_out = []
+    for team in teams_list:
+        teams_out.append([team.abbr, '', team.name])
 
     template = loader.get_template('charts/index.html')
-    context = { 'employees_tree':out}
+    context = { 'departments_tree':out, 'teams_tree' : teams_out}
     department = request.GET.get('dep', '')
     if (department):
         context['department']=str(department)
 
-
+    print(context)
     return render(request, 'charts/index.html', context)
 
 

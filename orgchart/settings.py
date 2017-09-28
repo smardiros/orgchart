@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 
 import os
 import ldap
-from django_auth_ldap.config import LDAPSearch
+from django_auth_ldap.config import LDAPSearch, LDAPGroupType, GroupOfNamesType
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -33,6 +33,7 @@ ALLOWED_HOSTS = ['*', 'http://dc-samweb.egpaf.com', 'localhost', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
+    'rulez',
     'dal',
     'dal_select2',
     'charts.apps.ChartsConfig',
@@ -74,15 +75,42 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'orgchart.wsgi.application'
 
-AUTH_LDAP_SERVER_URI = 'DC-NET1.egpaf.com'
-AUTH_LDAP_BIND_DN = "cn=django-agent,dc=example,dc=com"
-LDAP_AUTH_FORMAT_USERNAME = "django_python3_ldap.utils.format_username_active_directory"
-AUTH_LDAP_USER_SEARCH = LDAPSearch("ou=users,dc=example,dc=com", ldap.SCOPE_SUBTREE, "(uid=%(user)s)")
-
-AUTHENTICATION_BACKENDS = (
+AUTHENTICATION_BACKENDS = [
     'django_auth_ldap.backend.LDAPBackend',
     'django.contrib.auth.backends.ModelBackend',
+    'rulez.backends.ObjectPermissionBackend',
+]
+
+AUTH_LDAP_SERVER_URI = "ldap://dc-net1.egpaf.com"
+
+AUTH_LDAP_BIND_AS_AUTHENTICATING_USER = True
+AUTH_LDAP_BIND_DN = "CN=Sam-egpaf,OU=Administrators,OU=IT Service & Utility Accounts / Groups,OU=Consultants\, Service & Utility Accts,OU=Information Technology,OU=- Washington DC,OU=EGPAF Users - Active Accounts,DC=egpaf,DC=com"
+AUTH_LDAP_BIND_PASSWORD = "Tuesday_2017!"
+AUTH_LDAP_USER_SEARCH = LDAPSearch("OU= - Washington DC, OU=EGPAF Users - Active Accounts, DC=egpaf, DC=com",
+    ldap.SCOPE_SUBTREE, filterstr="(sAMAccountName=%(user)s)")
+
+
+AUTH_LDAP_CONNECTION_OPTIONS = {
+    ldap.OPT_DEBUG_LEVEL: 1,
+    ldap.OPT_REFERRALS: 0,
+}
+
+AUTH_LDAP_MIRROR_GROUPS = True
+
+AUTH_LDAP_GROUP_SEARCH = LDAPSearch("OU=Security Groups,DC=egpaf,DC=com",
+    ldap.SCOPE_SUBTREE, "(objectClass=top)"
 )
+AUTH_LDAP_GROUP_TYPE = GroupOfNamesType()
+
+
+AUTH_LDAP_USER_FLAGS_BY_GROUP = {
+    "is_active": "CN=BI360 Authorized Staff Users,OU=Security Groups,DC=egpaf,DC=com",
+    "is_staff": "CN=BI360 Authorized Staff Users,OU=Security Groups,DC=egpaf,DC=com",
+    "is_superuser": "CN=BI360 Authorized Staff Users,OU=Security Groups,DC=egpaf,DC=com",
+}
+
+# Use LDAP group membership to calculate group permissions.
+AUTH_LDAP_FIND_GROUP_PERMS = True
 
 
 # Database
