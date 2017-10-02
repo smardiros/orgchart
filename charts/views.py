@@ -8,7 +8,7 @@ import pyad
 from pyad import aduser, pyadexceptions
 from dal import autocomplete
 
-
+from django.contrib.auth.models import User, Group
 
 
 from .models import Employee, Department, Team
@@ -351,7 +351,19 @@ def team(request):
 
 
 def index(request):
-    departments_list = Department.objects.all()
+    try:
+        country = request.GET.get('country','')
+
+        if not country:
+            country = 'USA'
+
+        country_group = Group.objects.get(name=' - '.join(['Country',country]))
+    except:
+        country_group = Group.objects.get(name='Country - USA')
+
+    departments_list = Department.objects.filter(country=country_group)
+
+    print(departments_list)
     teams_list = Team.objects.all()
 
     out = []

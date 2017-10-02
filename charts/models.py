@@ -9,6 +9,7 @@ from django.contrib import admin
 
 import orgchart.settings as settings
 
+
 # Create your models here.
 color_choices = (
 	("navy", 'Navy'),
@@ -18,8 +19,18 @@ color_choices = (
 	("olive", 'Olive'),
 )
 
+class Country(models.Model):
+	name = models.CharField(max_length=100)
+	group = models.OneToOneField('auth.Group', unique=True, null=True, blank=True, related_name='group')
+	abbr = models.CharField(max_length=10, unique=True)
+
+	class Meta:
+		verbose_name_plural = "countries"
+	def __str__(self):
+		return self.name
 
 class Employee(models.Model):
+
 	employee_id = models.AutoField(primary_key=True)
 	name = models.CharField(max_length=100)
 	title = models.CharField(max_length=100, null=True, blank=True)
@@ -30,9 +41,12 @@ class Employee(models.Model):
 	collapse = models.BooleanField()
 	DepManager = models.BooleanField()
 
+	country = models.ForeignKey('auth.Group', on_delete=models.SET_NULL, null=True, blank=True) #,limit_choices_to={'name__startswith': 'Country'})
+
 	color = models.CharField(max_length=20, choices=color_choices,null=True,blank=True)
 
 	picture = models.FileField(upload_to='charts/static/charts/employee_pictures',null=True,blank=True)
+
 
 	def __str__(self):
 		return self.name
@@ -40,17 +54,20 @@ class Employee(models.Model):
 
 class Department(models.Model):
 	name = models.CharField(max_length=100)
-	abbr = models.CharField(max_length=10)
+	abbr = models.CharField(max_length=10, unique=True)
 	director = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True)
 	parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True)
 	color = models.CharField(max_length=20, choices=color_choices,null=True,blank=True)
+
+	country = models.ForeignKey('auth.Group', on_delete=models.SET_NULL, null=True, blank=True)
+
 
 	def __str__(self):
 		return self.name
 
 class Team(models.Model):
 	name = models.CharField(max_length=100)
-	abbr = models.CharField(max_length=10)
+	abbr = models.CharField(max_length=10, unique=True)
 	description = models.CharField(max_length=400)
 	manager = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, related_name="team_members")
 	permanent = models.BooleanField()

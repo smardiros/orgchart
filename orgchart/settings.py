@@ -33,7 +33,6 @@ ALLOWED_HOSTS = ['*', 'http://dc-samweb.egpaf.com', 'localhost', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
-    'rulez',
     'dal',
     'dal_select2',
     'charts.apps.ChartsConfig',
@@ -43,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'guardian',
 ]
 
 MIDDLEWARE = [
@@ -78,7 +78,7 @@ WSGI_APPLICATION = 'orgchart.wsgi.application'
 AUTHENTICATION_BACKENDS = [
     'django_auth_ldap.backend.LDAPBackend',
     'django.contrib.auth.backends.ModelBackend',
-    'rulez.backends.ObjectPermissionBackend',
+    'guardian.backends.ObjectPermissionBackend',
 ]
 
 AUTH_LDAP_SERVER_URI = "ldap://dc-net1.egpaf.com"
@@ -97,16 +97,16 @@ AUTH_LDAP_CONNECTION_OPTIONS = {
 
 AUTH_LDAP_MIRROR_GROUPS = True
 
-AUTH_LDAP_GROUP_SEARCH = LDAPSearch("OU=Security Groups,DC=egpaf,DC=com",
+AUTH_LDAP_GROUP_SEARCH = LDAPSearch("OU=IT Service & Utility Accounts / Groups,OU=Consultants\, Service & Utility Accts,OU=Information Technology,OU=- Washington DC,OU=EGPAF Users - Active Accounts,DC=egpaf,DC=com",
     ldap.SCOPE_SUBTREE, "(objectClass=top)"
 )
 AUTH_LDAP_GROUP_TYPE = GroupOfNamesType()
 
 
 AUTH_LDAP_USER_FLAGS_BY_GROUP = {
-    "is_active": "CN=BI360 Authorized Staff Users,OU=Security Groups,DC=egpaf,DC=com",
-    "is_staff": "CN=BI360 Authorized Staff Users,OU=Security Groups,DC=egpaf,DC=com",
-    "is_superuser": "CN=BI360 Authorized Staff Users,OU=Security Groups,DC=egpaf,DC=com",
+    "is_active": "CN=Sam's Fabulous Org Chart Group,OU=IT Service & Utility Accounts / Groups,OU=Consultants\, Service & Utility Accts,OU=Information Technology,OU=- Washington DC,OU=EGPAF Users - Active Accounts,DC=egpaf,DC=com",
+    "is_staff": "CN=Sam's Fabulous Org Chart Group,OU=IT Service & Utility Accounts / Groups,OU=Consultants\, Service & Utility Accts,OU=Information Technology,OU=- Washington DC,OU=EGPAF Users - Active Accounts,DC=egpaf,DC=com",
+    "is_superuser": "CN=Sam's Fabulous Org Chart Group,OU=IT Service & Utility Accounts / Groups,OU=Consultants\, Service & Utility Accts,OU=Information Technology,OU=- Washington DC,OU=EGPAF Users - Active Accounts,DC=egpaf,DC=com",
 }
 
 # Use LDAP group membership to calculate group permissions.
@@ -146,6 +146,33 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler'
+        },
+        'stream_to_console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler'
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        'django_auth_ldap': {
+            'handlers': ['stream_to_console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    }
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
