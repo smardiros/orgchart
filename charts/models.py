@@ -6,7 +6,6 @@ from django import forms
 
 from django.contrib import admin
 
-
 import orgchart.settings as settings
 
 
@@ -31,17 +30,22 @@ class Country(models.Model):
 
 class Employee(models.Model):
 
+	is_new = models.NullBooleanField(blank=True)
+
 	employee_id = models.AutoField(primary_key=True)
 	name = models.CharField(max_length=100)
 	title = models.CharField(max_length=100, null=True, blank=True)
+	country = models.ForeignKey('auth.Group', on_delete=models.SET_NULL, null=True, blank=True)
 	#displayclass = models.CharField(max_length=200, blank=True)
 	manager = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True)
 	departments = models.ManyToManyField('Department', blank=True)
 	teams = models.ManyToManyField('Team', blank=True)
-	collapse = models.BooleanField()
-	DepManager = models.BooleanField()
+	collapse = models.NullBooleanField(blank=True)
+	#DepManager = models.BooleanField()
 
-	country = models.ForeignKey('auth.Group', on_delete=models.SET_NULL, null=True, blank=True) #,limit_choices_to={'name__startswith': 'Country'})
+	 #,limit_choices_to={'name__startswith': 'Country'})
+
+	director_of_department = models.ManyToManyField('Department', blank=True, related_name='director_of')
 
 	color = models.CharField(max_length=20, choices=color_choices,null=True,blank=True)
 
@@ -55,7 +59,7 @@ class Employee(models.Model):
 class Department(models.Model):
 	name = models.CharField(max_length=100)
 	abbr = models.CharField(max_length=10, unique=True)
-	director = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True)
+	#director = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True)
 	parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True)
 	color = models.CharField(max_length=20, choices=color_choices,null=True,blank=True)
 

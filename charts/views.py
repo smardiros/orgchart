@@ -12,11 +12,73 @@ from django.contrib.auth.models import User, Group
 
 
 from .models import Employee, Department, Team
-import os
-import json
+import os, io
+import json, csv
 
 import pythoncom
 
+
+def gen_abbr(department_name):
+    abbr = ''
+    for word in department_name.split(' '):
+        abbr = ''.join([abbr,word[0]])
+    
+    count = 0
+
+    while True:
+        department_query = Department.objects.filter(abbr=abbr)
+        if not len(department_query):
+            return abbr + (count if count else '')
+        count += 1
+        
+
+def handle_csv_data(csv_file):
+    csv_file = io.TextIOWrapper(csv_file)  # python 3 only
+    dialect = csv.Sniffer().sniff(csv_file.read(1024), delimiters=";,")
+    csv_file.seek(0)
+    reader = csv.reader(csv_file, dialect)
+    lines = list(reader)
+    for line in lines:
+        print(line)
+
+    departments = list(set([line[2] for line in lines]))
+    print(departments)
+
+    for department in departments:
+        department_object = Department.objects.filter(name=department)
+        print(department)
+        print(department_object)
+        if not len(department_object):
+            Department.objects.create(name=department, abbr=gen_abbr(department))
+    countries = list(set([line[3] for line in lines]))
+    #print(countries)
+    for country in countries:
+        country_group = Group.objects.filter(name=''.join(['Country - ', country]))
+        if not len(country_group):
+            Group.objects.create(name=''.join(['Country - ', country]))
+
+    for line in lines:
+        employee_query = Employee.objects.filter(name=line[0])
+        if not len(employee_query):
+            employee = Employee.objects.create(name=line[0])
+        else:
+            employee = Employee.objects.get(name=line[0])
+        if line[1] is not '':
+            employee.director_of_department.add(Department.objects.get(name=line[1]))
+        if line[2] is not '':
+            employee.departments.add(Department.objects.get(name=line[1]))
+        employee.country = Group.objects.get(name=''.join(['Country - ', line[3]]))
+        employee.save()
+
+    return lines
+
+
+def upload_csv(request):
+    csv_content=[]
+    if request.method == 'POST':
+        csv_file = request.FILES['file'].file
+        csv_content = handle_csv_data(csv_file)  
+    return render(request, 'upload.html', {'content':csv_content})
 
 def getADNames():
     pythoncom.CoInitialize()
@@ -86,17 +148,24 @@ def dict_to_json_format(employees, collapsed=False, showall=False):
     return json
 
 def director_department(employee):
-    department = Department.objects.filter(director = employee)
+    department = Department.objects.filter(director_of = employee)
     return department
 
-def department_dict(department):
+def get_parent_department(department, country):
+    director = Employee.objects.filter(director_of_department=department).get(country=country).filter(is_new=False)
+    departments = director.manager.departments
+    if len(departments.all()) > 1:
+        return Department.objects.filter(employee=director).get(employee=director.manager)   
+
+
+def department_dict(department, country):
     print(department.abbr)
     if department.abbr != "egpaf":
-        employees_list = Employee.objects.filter(departments__in=[department])
+        employees_list = Employee.objects.filter(departments__in=[department]).filter(country=country).filter(is_new=False)
     else:
-        employees_list = Employee.objects.all()
+        employees_list = Employee.objects.filter(country=country).filter(is_new=False)
     pythoncom.CoInitialize()
-    director = department.director
+    director = department.director_of.get(country=country)
     #print(director, "\n\n")
     
     employees_dict = {}
@@ -123,50 +192,51 @@ def department_dict(department):
                 pass
             print(title)
             employees_id[employee.name] = employee.employee_id
-            manager_id = employee.manager.employee_id
-            employees_dict[employee.employee_id] = {"name": employee.name, "title": title, "className": "", "manager" : manager_id, "collapsed": employee.collapse, "sub" : {}, "department": department.name, "details": {}, "teams":{ "permanent":[], "temporary":[]}}
-            
-            for team in employee.teams.all():
-                if team.permanent:
-                    employees_dict[employee.employee_id]["teams"]["permanent"].append({"name": team.name, "abbr": team.abbr})
-                else:
-                    employees_dict[employee.employee_id]["teams"]["temporary"].append({"name": team.name, "abbr": team.abbr})
+            if(employee.manager is not None):
+                manager_id = employee.manager.employee_id
+                employees_dict[employee.employee_id] = {"name": employee.name, "title": title, "className": "", "manager" : manager_id, "collapsed": employee.collapse, "sub" : {}, "department": department.name, "details": {}, "teams":{ "permanent":[], "temporary":[]}}
+                
+                for team in employee.teams.all():
+                    if team.permanent:
+                        employees_dict[employee.employee_id]["teams"]["permanent"].append({"name": team.name, "abbr": team.abbr})
+                    else:
+                        employees_dict[employee.employee_id]["teams"]["temporary"].append({"name": team.name, "abbr": team.abbr})
 
-            if user is not None:
-                employees_dict[employee.employee_id]["details"] = {"mail" : mail, "phone" : phone, "department" : dep}
-            #print(employees_dict[employee.employee_id])
-            #print(employee, " ", employee.manager)
-            sub_director = director_department(employee)
-            color = " "
-            if employee.color is not None:
-                color += employee.color 
-            elif department.color is not None:
-                color += department.color
+                if user is not None:
+                    employees_dict[employee.employee_id]["details"] = {"mail" : mail, "phone" : phone, "department" : dep}
+                #print(employees_dict[employee.employee_id])
+                #print(employee, " ", employee.manager)
+                sub_director = director_department(employee)
+                color = " "
+                if employee.color is not None:
+                    color += employee.color 
+                elif department.color is not None:
+                    color += department.color
 
-            if employee.picture.name:
-                #print("picture + ", employee.picture)
-                employees_dict[employee.employee_id]["picture"] = employee.picture.url
-                employees_dict[employee.employee_id]["className"] += " picture"
+                if employee.picture.name:
+                    #print("picture + ", employee.picture)
+                    employees_dict[employee.employee_id]["picture"] = employee.picture.url
+                    employees_dict[employee.employee_id]["className"] += " picture"
 
 
 
-            employees_dict[employee.employee_id]["className"] += color
+                employees_dict[employee.employee_id]["className"] += color
 
-            if len(sub_director) > 0 and department.abbr != "egpaf":
-                print("subdirector : " + employee.name)
-                #print(len(sub_director))
-                if len(sub_director) == 1:
-                    dep = sub_director[0]
-                    employees_dict[employee.employee_id]["className"] += " drill-down asso-" + dep.abbr
-                    employees_dict[employee.employee_id]["downDep"] = dep.name
+                if len(sub_director) > 0 and department.abbr != "egpaf":
+                    print("subdirector : " + employee.name)
+                    #print(len(sub_director))
+                    if len(sub_director) == 1:
+                        dep = sub_director[0]
+                        employees_dict[employee.employee_id]["className"] += " drill-down asso-" + dep.abbr
+                        employees_dict[employee.employee_id]["downDep"] = dep.name
 
-                else:
-                    employees_dict[employee.employee_id]["collapsed"] = True
-                    temp_id = -1
-                    for dep in sub_director:
-                        temp_employee = {"name": "", "title": dep.name, "className": "slide-up drill-down asso-" + dep.abbr + color, "manager" : employee.employee_id, "collapsed": employee.collapse, "sub" : {}, "downDep": dep.name}
-                        employees_dict[temp_id] = temp_employee
-                        temp_id -= 1
+                    else:
+                        employees_dict[employee.employee_id]["collapsed"] = True
+                        temp_id = -1
+                        for dep in sub_director:
+                            temp_employee = {"name": "", "title": dep.name, "className": "slide-up drill-down asso-" + dep.abbr + color, "manager" : employee.employee_id, "collapsed": employee.collapse, "sub" : {}, "downDep": dep.name}
+                            employees_dict[temp_id] = temp_employee
+                            temp_id -= 1
 
 
     #print(employees_dict)
@@ -196,8 +266,8 @@ def department_dict(department):
         dir_entry["className"] += " " + director.color
     elif department.color is not None:
         dir_entry["className"] += " " + department.color
-    if director.manager is not None:
-        dir_entry["className"] += " drill-up asso-" + department.abbr + " up-" + department.parent.abbr
+    if director.manager.pk is not director.pk:
+        dir_entry["className"] += " drill-up asso-" + department.abbr + " up-" + get_parent_department(department,country).attr
 
     if director.picture.name:
         dir_entry["picture"] = director.picture.url
@@ -223,7 +293,7 @@ def department_dict(department):
     return dict_to_json_format(tree, showall=(department.abbr == "egpaf"))   
     
 def team_dict(team):
-    employees_list = Employee.objects.filter(teams=team)
+    employees_list = Employee.objects.filter(teams=team).filter(is_new=False)
     pythoncom.CoInitialize()
     manager = team.manager
 
@@ -329,6 +399,7 @@ def team_dict(team):
 
 
 def team(request):
+    #fix to match new departments
     departments_list = Department.objects.all()
     teams_list = Team.objects.all()
 
@@ -361,7 +432,7 @@ def index(request):
     except:
         country_group = Group.objects.get(name='Country - USA')
 
-    departments_list = Department.objects.filter(country=country_group)
+    departments_list = Department.objects.filter(director_of__country=country_group)
 
     print(departments_list)
     teams_list = Team.objects.all()
@@ -370,7 +441,7 @@ def index(request):
 
     for department in departments_list:
 
-        out.append([department.abbr, json.dumps(department_dict(department)[0]), department.name])
+        out.append([department.abbr, json.dumps(department_dict(department,country_group)[0]), department.name])
 
     teams_out = []
     for team in teams_list:
@@ -440,6 +511,7 @@ def update_employee(employee):
         db_emp.manager = Employee.objects.filter(name=employee['manager'])[0]
         print(db_emp.__dict__)
         db_emp.save()
+
 
 
 @require_http_methods(["POST"])

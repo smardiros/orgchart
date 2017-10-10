@@ -8,6 +8,7 @@ from django import forms
 
 
 from guardian.admin import GuardedModelAdmin
+from django.contrib.admin import widgets
 
 class CustomModelChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
@@ -15,7 +16,7 @@ class CustomModelChoiceField(forms.ModelChoiceField):
 
 class DepartmentsField(forms.ModelMultipleChoiceField):
     def label_from_instance(self, obj):
-        return obj.name + ', ' + obj.country.name.split('-')[1].strip()
+        return obj.name
 
 class EmployeeForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -32,15 +33,29 @@ class EmployeeForm(forms.ModelForm):
         widget=autocomplete.ModelSelect2(url='employee-autocomplete'),
         required=False
     )
+
     
     country = CustomModelChoiceField(required=False, queryset=Group.objects.filter(name__startswith='Country'))
 
     departments = DepartmentsField(required=False, queryset=Department.objects.all())
 
+    department_test = DepartmentsField(required=False, queryset=Department.objects.all())
 
     def clean(self):
         cleaned_data = super(EmployeeForm, self).clean()
         country = cleaned_data["country"]
+        departments = cleaned_data['departments']
+        director_of_departments = cleaned_data["director_of_department"]
+        for director_of_department in director_of_departments:
+            directors = Employee.objects.filter(director_of_department=director_of_department).filter(country=country).exclude(pk=self.instance.pk)
+            if directors:
+                raise forms.ValidationError(
+                    ''.join(['Director of ' + director_of_department.name + ' already exists for this country.'])
+                )
+        if any(director_of_department not in departments for director_of_department in director_of_departments) and director_of_departments is not None:
+            raise forms.ValidationError(
+                'Employee cannot be director of department they are not in.'
+            )
         print(country)
         print(self.request.user.groups.all())
         if not self.request.user.is_superuser and country not in self.request.user.groups.filter(name__startswith='Country'):
@@ -50,7 +65,8 @@ class EmployeeForm(forms.ModelForm):
 
     class Meta:
         model = Employee
-        fields = ('__all__')
+        exclude = ('is_new',)
+        #fields = ('__all__')
 
 
 
@@ -107,28 +123,32 @@ class EmployeeAdmin(admin.ModelAdmin):
             # can't see the changelist
 
 
-    list_display = ('name', 'get_departments', 'title')
+    list_display = ('name', 'get_departments', 'title', 'country_name')
     #form = EmployeeForm
 
     def get_departments(self, obj):
         return ", ".join([p.name for p in obj.departments.all()])
 
+    def country_name(self, obj):
+        if obj.country is not None:
+            return obj.country.name.split(' - ')[1]
+        return ''
+
 class DepartmentForm(forms.ModelForm):
-    director = forms.ModelChoiceField(
-        queryset=Employee.objects.all(),
-        widget=autocomplete.ModelSelect2(url='employee-autocomplete')
-    )
+    # director = forms.ModelChoiceField(
+    #     queryset=Employee.objects.all(),
+    #     widget=autocomplete.ModelSelect2(url='employee-autocomplete')
+    # )
 
     class Meta:
         model = Employee
         fields = ('__all__')
 
     
-    
     country = CustomModelChoiceField(required=False, queryset=Group.objects.filter(name__startswith='Country'))
 
 class DepartmentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'get_country', 'director')
+    # list_display = ('name', 'get_country', 'director')
     form = DepartmentForm
 
     def has_module_permission(self, request, obj=None):
@@ -139,11 +159,11 @@ class DepartmentAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super(DepartmentAdmin, self).get_queryset(request)
-        if request.user.is_superuser:
-            return qs
+        #if request.user.is_superuser:
+        return qs
         
-        print(request.user)
-        return qs.filter(country__in=request.user.groups.filter(name__startswith='Country'))
+        #print(request.user)
+        #return qs.filter(country__in=request.user.groups.filter(name__startswith='Country'))
 
     def has_change_permission(self, request, obj=None):
         # Here you have the object, but this is only really useful if it has
@@ -162,11 +182,11 @@ class DepartmentAdmin(admin.ModelAdmin):
             # Then, users must "own" *something* or be a superuser or they
             # can't see the changelist
     
-    def get_country(self, obj):
-        if obj.country is not None:
-            return obj.country.name.split('-')[1].strip()
-        else:
-            return ''
+    # def get_country(self, obj):
+    #     if obj.country is not None:
+    #         return obj.country.name.split('-')[1].strip()
+    #     else:
+    #         return ''
 
 class TeamForm(forms.ModelForm):
     manager = forms.ModelChoiceField(
