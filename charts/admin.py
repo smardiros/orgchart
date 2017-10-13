@@ -76,6 +76,7 @@ class EmployeeAdmin(admin.ModelAdmin):
     #form = EmployeeForm(request=request)
 
     form = EmployeeForm
+    list_filter = ('country', 'departments')
     def get_form(self, request, obj=None, **kwargs):
         ModelForm = super(EmployeeAdmin, self).get_form(request, obj, **kwargs)
         class ModelFormMetaClass(ModelForm):
@@ -182,6 +183,8 @@ class DepartmentAdmin(admin.ModelAdmin):
             # Then, users must "own" *something* or be a superuser or they
             # can't see the changelist
     
+
+    list_display = ('name','abbr')
     # def get_country(self, obj):
     #     if obj.country is not None:
     #         return obj.country.name.split('-')[1].strip()

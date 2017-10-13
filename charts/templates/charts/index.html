@@ -1,7 +1,7 @@
 {% extends 'charts/base.html' %}
 {% load static %}
 {% load js %}
-
+{% load auth_extras %}
 {% csrf_token %}
 
 {% block body_block %}
@@ -95,9 +95,11 @@
 				<div class="col-md-8">
 				</div>
 				<div class="col-md-4 col-md-offset-4">
+      {% if request.user|has_group:"Sam's Fabulous Org Chart Group" %}
 				<div id="save-button" class="save-button">
 					<div ></div>
 				</div>
+      {% endif %}
 				</div>
 			</div>
 		</div>
@@ -107,7 +109,9 @@
 				<div id='pic-container'></div>
 				<div id='profile-container'></div>
 				<div id='teams-container'></div>
-				<div id='profile-save-button'><div><div/></div>
+        {% if request.user|has_group:"Sam's Fabulous Org Chart Group" %}
+				  <div id='profile-save-button'><div><div/></div>
+        {% endif %}
 			</div>
 		</div>
 		</div>

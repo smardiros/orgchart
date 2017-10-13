@@ -9,14 +9,22 @@ from pyad import aduser, pyadexceptions
 from dal import autocomplete
 
 from django.contrib.auth.models import User, Group
-
+from pywintypes import com_error
 
 from .models import Employee, Department, Team
 import os, io
 import json, csv
+from django.shortcuts import redirect
 
 import pythoncom
 
+
+class AuthRequiredMiddleware(object):
+    def process_request(self, request):
+        print('checking if user logged in!')
+        if not request.user.is_authenticated():
+            return HttpResponseRedirect(reverse('landing_page')) # or http response
+        return None
 
 def gen_abbr(department_name):
     abbr = ''
@@ -32,25 +40,38 @@ def gen_abbr(department_name):
         count += 1
         
 
-def handle_csv_data(csv_file):
+def handle_csv_data(csv_file, has_header):
+    print("header:")
+    if has_header:
+        print(has_header)
     csv_file = io.TextIOWrapper(csv_file)  # python 3 only
     dialect = csv.Sniffer().sniff(csv_file.read(1024), delimiters=";,")
     csv_file.seek(0)
     reader = csv.reader(csv_file, dialect)
-    lines = list(reader)
+    if has_header:
+        header, *lines = list(reader)
+        header = {heading.lower(): x for x, heading in enumerate(header)}
+    else:
+        lines = list(reader)
+        header = {  'name':0,
+                    'director of':1,
+                    'department':2,
+                    'country':3,
+                    'manager':4}
     for line in lines:
         print(line)
 
-    departments = list(set([line[2] for line in lines]))
+    departments = list(set([line[ header['department']] for line in lines]))
     print(departments)
 
     for department in departments:
-        department_object = Department.objects.filter(name=department)
-        print(department)
-        print(department_object)
-        if not len(department_object):
-            Department.objects.create(name=department, abbr=gen_abbr(department))
-    countries = list(set([line[3] for line in lines]))
+        if department is not '':
+            department_object = Department.objects.filter(name=department)
+            print(department)
+            print(department_object)
+            if not len(department_object):
+                Department.objects.create(name=department, abbr=gen_abbr(department))
+    countries = list(set([line[ header['country']] for line in lines]))
     #print(countries)
     for country in countries:
         country_group = Group.objects.filter(name=''.join(['Country - ', country]))
@@ -58,16 +79,28 @@ def handle_csv_data(csv_file):
             Group.objects.create(name=''.join(['Country - ', country]))
 
     for line in lines:
-        employee_query = Employee.objects.filter(name=line[0])
+        employee_query = Employee.objects.filter(name=line[ header['name']])
         if not len(employee_query):
-            employee = Employee.objects.create(name=line[0])
+            employee = Employee.objects.create(name=line[ header['name']])
         else:
-            employee = Employee.objects.get(name=line[0])
-        if line[1] is not '':
-            employee.director_of_department.add(Department.objects.get(name=line[1]))
-        if line[2] is not '':
-            employee.departments.add(Department.objects.get(name=line[1]))
-        employee.country = Group.objects.get(name=''.join(['Country - ', line[3]]))
+            employee = Employee.objects.get(name=line[ header['name']])
+        if line[ header['director of']] is not '':
+            employee.director_of_department.add(Department.objects.get(name=line[ header['director of']]))
+        if line[ header['department']] is not '':
+            department = Department.objects.get(name=line[ header['department']])
+            employee.departments.add(Department.objects.get(name=line[ header['department']]))
+        if department.director_of is not None:
+            director_query = department.director_of.filter(country__name=''.join(['Country - ', line[ header['country']]]))
+            if director_query:
+                employee.manager = director_query[0]
+        if 'manager' in header:
+            if line[header['manager']] is not '':
+                manager_query = Employee.objects.filter(name=line[header['manager']])
+                if manager_query:
+                    employee.manager = manager_query[0]
+        
+                
+        employee.country = Group.objects.get(name=''.join(['Country - ', line[ header['country']]]))
         employee.save()
 
     return lines
@@ -77,7 +110,8 @@ def upload_csv(request):
     csv_content=[]
     if request.method == 'POST':
         csv_file = request.FILES['file'].file
-        csv_content = handle_csv_data(csv_file)  
+        has_header = request.POST.get('header',False)
+        csv_content = handle_csv_data(csv_file,has_header)  
     return render(request, 'upload.html', {'content':csv_content})
 
 def getADNames():
@@ -152,18 +186,24 @@ def director_department(employee):
     return department
 
 def get_parent_department(department, country):
-    director = Employee.objects.filter(director_of_department=department).get(country=country).filter(is_new=False)
+    print('getting parent')
+    print(department)
+    print(country)
+    director = Employee.objects.filter(director_of_department=department).get(country=country)
     departments = director.manager.departments
     if len(departments.all()) > 1:
+        print(Department.objects.filter(employee=director))
+        print(Department.objects.filter(employee=director).get(employee=director.manager)   )
         return Department.objects.filter(employee=director).get(employee=director.manager)   
+    return departments.all()[0]
 
 
 def department_dict(department, country):
     print(department.abbr)
     if department.abbr != "egpaf":
-        employees_list = Employee.objects.filter(departments__in=[department]).filter(country=country).filter(is_new=False)
+        employees_list = Employee.objects.filter(departments__in=[department]).filter(country=country)
     else:
-        employees_list = Employee.objects.filter(country=country).filter(is_new=False)
+        employees_list = Employee.objects.filter(country=country)
     pythoncom.CoInitialize()
     director = department.director_of.get(country=country)
     #print(director, "\n\n")
@@ -185,7 +225,7 @@ def department_dict(department, country):
                 title = user.description
                 phone = user.telephoneNumber
                 dep = user.department
-            except pyadexceptions.invalidResults as e:
+            except (pyadexceptions.invalidResults, com_error) as e:
                 user = None
                 title = employee.title
                 print(employee.name + str(e))
@@ -194,7 +234,7 @@ def department_dict(department, country):
             employees_id[employee.name] = employee.employee_id
             if(employee.manager is not None):
                 manager_id = employee.manager.employee_id
-                employees_dict[employee.employee_id] = {"name": employee.name, "title": title, "className": "", "manager" : manager_id, "collapsed": employee.collapse, "sub" : {}, "department": department.name, "details": {}, "teams":{ "permanent":[], "temporary":[]}}
+                employees_dict[employee.employee_id] = {"name": " ".join(employee.name.split()), "title": title, "className": "", "manager" : manager_id, "collapsed": employee.collapse, "sub" : {}, "department": department.name, "details": {}, "teams":{ "permanent":[], "temporary":[]}}
                 
                 for team in employee.teams.all():
                     if team.permanent:
@@ -253,7 +293,7 @@ def department_dict(department, country):
         print(director.name + str(e))
         pass
 
-    dir_entry = {"name": director.name, "title": title, "className": "", "collapsed": director.collapse, "sub" : {}, "department": department.name, "details": {}, "teams":{ "permanent":[], "temporary":[]}}
+    dir_entry = {"name": " ".join(director.name.split()), "title": title, "className": "", "collapsed": director.collapse, "sub" : {}, "department": department.name, "details": {}, "teams":{ "permanent":[], "temporary":[]}}
     for team in director.teams.all():
         if team.permanent:
             dir_entry["teams"]["permanent"].append({"name": team.name, "abbr": team.abbr})
@@ -266,8 +306,8 @@ def department_dict(department, country):
         dir_entry["className"] += " " + director.color
     elif department.color is not None:
         dir_entry["className"] += " " + department.color
-    if director.manager.pk is not director.pk:
-        dir_entry["className"] += " drill-up asso-" + department.abbr + " up-" + get_parent_department(department,country).attr
+    if director.manager is not None and director.manager.pk is not director.pk:
+        dir_entry["className"] += " drill-up asso-" + department.abbr + " up-" + get_parent_department(department,country).abbr
 
     if director.picture.name:
         dir_entry["picture"] = director.picture.url
@@ -422,39 +462,45 @@ def team(request):
 
 
 def index(request):
-    try:
-        country = request.GET.get('country','')
+    print('-----------------')
+    print(request.user)
+    print('-----------------')
+    if(request.user.is_authenticated()):
+        try:
+            country = request.GET.get('country','')
 
-        if not country:
-            country = 'USA'
+            if not country:
+                country = 'USA'
 
-        country_group = Group.objects.get(name=' - '.join(['Country',country]))
-    except:
-        country_group = Group.objects.get(name='Country - USA')
+            country_group = Group.objects.get(name=' - '.join(['Country',country]))
+        except:
+            country_group = Group.objects.get(name='Country - USA')
 
-    departments_list = Department.objects.filter(director_of__country=country_group)
+        departments_list = Department.objects.filter(director_of__country=country_group)
 
-    print(departments_list)
-    teams_list = Team.objects.all()
+        print(departments_list)
+        teams_list = Team.objects.all()
 
-    out = []
+        out = []
 
-    for department in departments_list:
+        for department in departments_list:
 
-        out.append([department.abbr, json.dumps(department_dict(department,country_group)[0]), department.name])
+            out.append([department.abbr, json.dumps(department_dict(department,country_group)[0]), department.name])
 
-    teams_out = []
-    for team in teams_list:
-        teams_out.append([team.abbr, '', team.name])
+        teams_out = []
+        for team in teams_list:
+            teams_out.append([team.abbr, '', team.name])
 
-    template = loader.get_template('charts/index.html')
-    context = { 'departments_tree':out, 'teams_tree' : teams_out}
-    department = request.GET.get('dep', '')
-    if (department):
-        context['department']=str(department)
+        template = loader.get_template('charts/index.html')
+        context = { 'departments_tree':out, 'teams_tree' : teams_out}
+        department = request.GET.get('dep', '')
+        if (department):
+            context['department']=str(department)
 
-    print(context)
-    return render(request, 'charts/index.html', context)
+        print(context)
+        return render(request, 'charts/index.html', context)
+    else:
+        return redirect('/login')
 
 
     

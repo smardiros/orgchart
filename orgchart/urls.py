@@ -22,11 +22,15 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 #from charts import settings
 from django.views.generic import RedirectView
 
+from django.contrib.auth.views import login, logout
+
 admin.autodiscover()
 
 urlpatterns = [
 	url(r'^$', RedirectView.as_view(url='charts')),
 	url(r'^charts/', include('charts.urls')),
     url(r'^admin/', admin.site.urls),
+    url(r'^login/$', login, {'template_name': 'admin/login.html'}),
+    url(r'^logout/$', logout)
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
