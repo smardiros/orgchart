@@ -12,9 +12,9 @@
 		departments.push( "{{ dict.0 }}")
 		var {{ dict.0 }} = {{ dict.1 | js}};
 	{% endfor %}
-
 	{% if department %}
 		var department = "{{ department }}";
+    
 	{% endif %}
 
   {% if team %}

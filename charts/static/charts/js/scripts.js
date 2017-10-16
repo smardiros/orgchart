@@ -111,12 +111,14 @@
         }
       });
     };
-
-    document.getElementById('save-button').replaceChild(savebutton, document.getElementById('save-button').childNodes[0]);
-
-
-
     window.curr_department = rootClass;
+    if(document.getElementById('save-button')){
+      document.getElementById('save-button').replaceChild(savebutton, document.getElementById('save-button').childNodes[0]);
+    }
+
+
+
+    
   }
 
   $(function() {
