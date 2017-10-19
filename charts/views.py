@@ -193,8 +193,8 @@ def get_parent_department(department, country):
     departments = director.manager.departments
     if len(departments.all()) > 1:
         print(Department.objects.filter(employee=director))
-        print(Department.objects.filter(employee=director).get(employee=director.manager)   )
-        return Department.objects.filter(employee=director).get(employee=director.manager)   
+        print(Department.objects.filter(employee=director).exclude(pk=department.pk).get(employee=director.manager)   )
+        return Department.objects.filter(employee=director).exclude(pk=department.pk).get(employee=director.manager)   
     return departments.all()[0]
 
 

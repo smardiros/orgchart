@@ -39,8 +39,6 @@ class EmployeeForm(forms.ModelForm):
 
     departments = DepartmentsField(required=False, queryset=Department.objects.all())
 
-    department_test = DepartmentsField(required=False, queryset=Department.objects.all())
-
     def clean(self):
         cleaned_data = super(EmployeeForm, self).clean()
         country = cleaned_data["country"]
@@ -77,6 +75,7 @@ class EmployeeAdmin(admin.ModelAdmin):
 
     form = EmployeeForm
     list_filter = ('country', 'departments')
+    search_fields = ('name',)
     def get_form(self, request, obj=None, **kwargs):
         ModelForm = super(EmployeeAdmin, self).get_form(request, obj, **kwargs)
         class ModelFormMetaClass(ModelForm):
